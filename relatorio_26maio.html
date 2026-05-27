@@ -627,11 +627,27 @@ kpi('kpi-guep',[{l:'Total Validado',v:gT,s:'registros na planilha GUEP',c:''},{l
 const tAG=Object.entries(countBy(guep,'r')).sort((a,b)=>b[1]-a[1])[0];
 const gNA=gRe+gLi+gFa+gPe;
 ins('insights-guep',[{c:'green',t:'✅ Taxa de Aprovação',x:`<strong>${gAp} de ${gT}</strong> aprovados — <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'red',t:'🚫 Não Aprovados',x:`<strong>${gNA} motoristas</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc, ${gPe} pendentes.`},{c:'orange',t:'🚗 Licenciamento Vencido',x:`<strong>${gLi} motorista${gLi!==1?'s':''}</strong> — podem regularizar e retornar.`},{c:'purple',t:'📄 Falta de Documentação',x:`<strong>${gFa} motorista${gFa!==1?'s':''}</strong> — pipeline recuperável.`},{c:'',t:'👤 Responsável Mais Ativo',x:`<strong>${tAG[0]}</strong> com <strong>${tAG[1]} validações</strong>.`},{c:'',t:'📊 Visão Geral',x:`<strong>${gT} validações</strong> registradas na planilha oficial GUEP.`}]);
-const stC={'APROVADO':'#16a34a','REPROVADO':'#dc2626','LICENCIAMENTO':'#ea580c','FALTA DOC':'#7c3aed','PENDENTE ENVIO p/ GUEP':'#6b7280'};
-const gSt=countBy(guep,'s');
-new Chart(document.getElementById('cGS'),{type:'doughnut',data:{labels:Object.keys(gSt),datasets:[{data:Object.values(gSt),backgroundColor:Object.keys(gSt).map(k=>stC[k]||'#9ca3af'),borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{labels:{color:'#374151',font:{family:'Inter',size:11}}}},cutout:'60%'},plugins:[{id:'gs',afterDatasetsDraw(chart){const{ctx,data}=chart;chart.getDatasetMeta(0).data.forEach((arc,i)=>{const v=data.datasets[0].data[i];if(!v)return;const{x,y}=arc.tooltipPosition();ctx.save();ctx.fillStyle='#fff';ctx.font='bold 11px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,x,y);ctx.restore();});}}]});
+// Donut GUEP — ordem e cores fixas
+const stOrdem=['APROVADO','REPROVADO','LICENCIAMENTO','FALTA DOC','PENDENTE ENVIO p/ GUEP'];
+const stC={'APROVADO':'#16a34a','REPROVADO':'#dc2626','LICENCIAMENTO':'#ea580c','FALTA DOC':'#7c3aed','PENDENTE ENVIO p/ GUEP':'#9ca3af'};
+const gStRaw=countBy(guep,'s');
+const gStLabels=stOrdem.filter(k=>gStRaw[k]);
+const gStData=gStLabels.map(k=>gStRaw[k]);
+const gStColors=gStLabels.map(k=>stC[k]);
+new Chart(document.getElementById('cGS'),{type:'doughnut',data:{labels:gStLabels,datasets:[{data:gStData,backgroundColor:gStColors,borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#374151',font:{family:'Inter',size:11},padding:16,boxWidth:12}}},cutout:'60%'},plugins:[{id:'gs',afterDatasetsDraw(chart){const{ctx,data}=chart;chart.getDatasetMeta(0).data.forEach((arc,i)=>{const v=data.datasets[0].data[i];if(!v)return;const{x,y}=arc.tooltipPosition();ctx.save();ctx.fillStyle='#fff';ctx.font='bold 11px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,x,y);ctx.restore();});}}]});
 const gRsp=countBy(guep,'r');
-new Chart(document.getElementById('cGR'),{type:'bar',data:{labels:Object.keys(gRsp),datasets:[{data:Object.values(gRsp),backgroundColor:COLORS,borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
+const gRspSorted=Object.entries(gRsp).sort((a,b)=>b[1]-a[1]);
+new Chart(document.getElementById('cGR'),{type:'bar',data:{
+  labels:gRspSorted.map(([k])=>k),
+  datasets:[{
+    data:gRspSorted.map(([,v])=>v),
+    backgroundColor:'#2D3277',
+    borderRadius:2
+  }]
+},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{
+  x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},
+  y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}
+}}});
 renderAssist('assist-guep',gRsp);
 guep.forEach(r=>{document.getElementById('tb-guep').innerHTML+=`<tr><td>${r.r}</td><td>${r.n}</td><td style="color:var(--muted)">${r.c||'—'}</td><td style="color:var(--muted)">${r.p||'—'}</td><td>${r.f?`<span class="badge b-fixa">${r.f}</span>`:'—'}</td><td>${gBadge(r.s)}</td></tr>`;});
 
