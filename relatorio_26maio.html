@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  :root{--bg:#f5f5f0;--surface:#fff;--border:#e2e2db;--yellow:#FFE600;--yellow-dim:rgba(255,230,0,0.2);--blue:#073763;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--text:#1a1a2e;--muted:#6b7280;--card-bg:#fff;}
+  :root{--bg:#f5f5f0;--surface:#fff;--border:#e2e2db;--yellow:#FFE600;--yellow-dim:rgba(255,230,0,0.2);--blue:#073763;--green:#073763;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--text:#1a1a2e;--muted:#6b7280;--card-bg:#fff;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
   header{background:var(--blue);border-bottom:3px solid var(--yellow);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
@@ -611,11 +611,11 @@ const tAP=Object.entries(countBy(pesca,'a')).sort((a,b)=>b[1]-a[1])[0];
 const tRP=Object.entries(countBy(pesca,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1])[0];
 ins('insights-pesca',[{c:'',t:'🏆 Base Mais Pescada',x:`<strong>${tBP[0]}</strong> liderou com <strong>${tBP[1]} abordagens</strong>.`},{c:'green',t:'✅ Aprovação no Gerador',x:`<strong>${pAp} de ${pT}</strong> com status aprovado (${Math.round(pAp/pT*100)}%).`},{c:'red',t:'🚫 Reprovados no Gerador',x:`<strong>${pRe} registro${pRe!==1?'s':''}</strong> com reprovação registrada.`},{c:'orange',t:'⏳ Sem Status Preenchido',x:`<strong>${pPe} registro${pPe!==1?'s':''}</strong> sem status — pode haver mais reprovados não registrados.`},{c:'',t:'🗺️ Regional Destaque',x:`Regional <strong>${tRP[0]}</strong> concentrou o maior volume.`},{c:'',t:'👤 Mais Ativo na Pesca',x:`<strong>${tAP[0]}</strong> com <strong>${tAP[1]} abordagens</strong>.`}]);
 new Chart(document.getElementById('cVP'),{type:'bar',data:{labels:Object.keys(countBy(pesca,'v')),datasets:[{data:Object.values(countBy(pesca,'v')),backgroundColor:COLORS,borderRadius:2}]},options:scOpts()});
-mkDonut('cMP',Object.keys(countBy(pesca,'m')).map(k=>k||'N/A'),Object.values(countBy(pesca,'m')),['#2D3277','#FFE600','#16a34a','#9ca3af'],'mpesca');
+mkDonut('cMP',Object.keys(countBy(pesca,'m')).map(k=>k||'N/A'),Object.values(countBy(pesca,'m')),['#073763','#FFE600','#3d3d3d','#a8a8a8'],'mpesca');
 const rPf=Object.fromEntries(Object.entries(countBy(pesca,'r')).filter(([k])=>k&&k!=='N/A'));
 new Chart(document.getElementById('cRP'),{type:'bar',data:{labels:Object.keys(rPf),datasets:[{data:Object.values(rPf),backgroundColor:COLORS,borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
 const gPC=countBy(pesca,'g');
-mkDonut('cGP',Object.keys(gPC).map(k=>k||'Pendente'),Object.values(gPC),['#16a34a','#dc2626','#9ca3af'],'gpesca');
+mkDonut('cGP',Object.keys(gPC).map(k=>k||'Pendente'),Object.values(gPC),['#073763','#3d3d3d','#a8a8a8'],'gpesca');
 renderBars('bases-pesca',countBy(pesca,'b'),'blue');
 renderAssist('assist-pesca',countBy(pesca,'a'));
 pesca.forEach(r=>{document.getElementById('tb-pesca').innerHTML+=`<tr><td>${r.a}</td><td>${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${r.m||'—'}</td><td>${gBadge(r.g)}</td></tr>`;});
@@ -660,9 +660,9 @@ const tRC=Object.entries(countBy(cont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').
 const p0c=cont.filter(r=>r.p==='P0').length;
 ins('insights-cont',[{c:'',t:'🏆 Base Líder',x:`<strong>${tBC[0]}</strong> com <strong>${tBC[1]} contratações</strong>.`},{c:'',t:'🚚 Veículo Mais Contratado',x:`<strong>${tVC[0]}</strong> com <strong>${tVC[1]} unidades</strong>.`},{c:'green',t:'🔗 Penetração ETC',x:`<strong>${cEt} contratações (${Math.round(cEt/cT*100)}%)</strong> via ETC.`},{c:'red',t:'⚡ Demandas P0',x:`<strong>${p0c} urgentes (P0)</strong> realizadas hoje.`},{c:'',t:'🗺️ Regional Líder',x:`<strong>${tRC[0]}</strong> liderou.`},{c:'orange',t:'📦 Frota Fixa',x:`<strong>${cFx} (${Math.round(cFx/cT*100)}%)</strong> Frota Fixa.`}]);
 new Chart(document.getElementById('cVC'),{type:'bar',data:{labels:Object.keys(countBy(cont,'v')),datasets:[{data:Object.values(countBy(cont,'v')),backgroundColor:COLORS,borderRadius:2}]},options:scOpts()});
-mkDonut('cMC',Object.keys(countBy(cont,'m')).map(k=>k||'N/A'),Object.values(countBy(cont,'m')),['#2D3277','#FFE600','#16a34a','#9ca3af'],'mcont');
-mkDonut('cFC',['Spot','Fixa'],[cSp,cFx],['#2D3277','#FFE600'],'fcont');
-mkDonut('cEC',['Com ETC','Sem ETC'],[cEt,cT-cEt],['#16a34a','#d1d5db'],'econt');
+mkDonut('cMC',Object.keys(countBy(cont,'m')).map(k=>k||'N/A'),Object.values(countBy(cont,'m')),['#073763','#FFE600','#3d3d3d','#a8a8a8'],'mcont');
+mkDonut('cFC',['Spot','Fixa'],[cSp,cFx],['#073763','#FFE600'],'fcont');
+mkDonut('cEC',['Com ETC','Sem ETC'],[cEt,cT-cEt],['#073763','#3d3d3d'],'econt');
 const prC=countBy(cont,'p');
 new Chart(document.getElementById('cPR'),{type:'bar',data:{labels:Object.keys(prC),datasets:[{data:Object.values(prC),backgroundColor:['#073763','#3d3d3d','#FFE600','#1a5fa8','#a0a0a0'],borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
 renderBars('bases-cont',countBy(cont,'b'),'blue');
@@ -765,7 +765,7 @@ ${tRgC.map(([r,c])=>`\u2022 ${r}: *${c}*`).join('\n')}
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
 \u{00C1}rea de Contrata\u{00E7}\u{00E3}o de Motoristas \u00B7 Mercado Livre`;
 document.getElementById('resumo-texto').textContent=resumo;
-function copyResumo(){navigator.clipboard.writeText(document.getElementById('resumo-texto').textContent).then(()=>{const b=document.querySelector('button[onclick="copyResumo()"]');b.textContent='COPIADO \u2713';b.style.background='#16a34a';b.style.color='#fff';setTimeout(()=>{b.textContent='COPIAR';b.style.background='var(--yellow)';b.style.color='#000';},2000);});}
+function copyResumo(){navigator.clipboard.writeText(document.getElementById('resumo-texto').textContent).then(()=>{const b=document.querySelector('button[onclick="copyResumo()"]');b.textContent='COPIADO \u2713';b.style.background='#073763';b.style.color='#fff';setTimeout(()=>{b.textContent='COPIAR';b.style.background='var(--yellow)';b.style.color='#000';},2000);});}
 function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['pesca','guep','contratacao','cruzamento','resumo'][i]===n);});document.querySelectorAll('.tab-content').forEach(c=>{c.classList.toggle('active',c.id==='tab-'+n);});}
 </script>
 </body>
