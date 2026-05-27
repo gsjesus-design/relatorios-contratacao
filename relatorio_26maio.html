@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  :root{--bg:#f5f5f0;--surface:#fff;--border:#e2e2db;--yellow:#FFE600;--yellow-dim:rgba(255,230,0,0.2);--blue:#2D3277;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--text:#1a1a2e;--muted:#6b7280;--card-bg:#fff;}
+  :root{--bg:#f5f5f0;--surface:#fff;--border:#e2e2db;--yellow:#FFE600;--yellow-dim:rgba(255,230,0,0.2);--blue:#073763;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--text:#1a1a2e;--muted:#6b7280;--card-bg:#fff;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
   header{background:var(--blue);border-bottom:3px solid var(--yellow);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
@@ -569,7 +569,7 @@ const cont=[
 ];
 
 // ===== HELPERS =====
-const COLORS=['#2D3277','#16a34a','#ea580c','#dc2626','#7c3aed','#0891b2','#d97706','#db2777','#65a30d','#f59e0b'];
+const COLORS=['#073763','#FFE600','#3d3d3d','#1a5fa8','#f5c200','#6b6b6b','#0a4d8a','#ccb800','#2a2a2a','#3378c5'];
 const norm=s=>(s||'').trim().toLowerCase().replace(/\s+/g,' ');
 function countBy(arr,key){return arr.reduce((a,r)=>{const v=r[key]||'N/A';a[v]=(a[v]||0)+1;return a;},{});}
 const scOpts=(horiz=false)=>({plugins:{legend:{display:false}},scales:horiz?{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}}}});
@@ -629,7 +629,7 @@ const gNA=gRe+gLi+gFa+gPe;
 ins('insights-guep',[{c:'green',t:'✅ Taxa de Aprovação',x:`<strong>${gAp} de ${gT}</strong> aprovados — <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'red',t:'🚫 Não Aprovados',x:`<strong>${gNA} motoristas</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc, ${gPe} pendentes.`},{c:'orange',t:'🚗 Licenciamento Vencido',x:`<strong>${gLi} motorista${gLi!==1?'s':''}</strong> — podem regularizar e retornar.`},{c:'purple',t:'📄 Falta de Documentação',x:`<strong>${gFa} motorista${gFa!==1?'s':''}</strong> — pipeline recuperável.`},{c:'',t:'👤 Responsável Mais Ativo',x:`<strong>${tAG[0]}</strong> com <strong>${tAG[1]} validações</strong>.`},{c:'',t:'📊 Visão Geral',x:`<strong>${gT} validações</strong> registradas na planilha oficial GUEP.`}]);
 // Donut GUEP — ordem e cores fixas
 const stOrdem=['APROVADO','REPROVADO','LICENCIAMENTO','FALTA DOC','PENDENTE ENVIO p/ GUEP'];
-const stC={'APROVADO':'#16a34a','REPROVADO':'#dc2626','LICENCIAMENTO':'#ea580c','FALTA DOC':'#7c3aed','PENDENTE ENVIO p/ GUEP':'#9ca3af'};
+const stC={'APROVADO':'#073763','REPROVADO':'#3d3d3d','LICENCIAMENTO':'#FFE600','FALTA DOC':'#1a5fa8','PENDENTE ENVIO p/ GUEP':'#a0a0a0'};
 const gStRaw=countBy(guep,'s');
 const gStLabels=stOrdem.filter(k=>gStRaw[k]);
 const gStData=gStLabels.map(k=>gStRaw[k]);
@@ -641,7 +641,7 @@ new Chart(document.getElementById('cGR'),{type:'bar',data:{
   labels:gRspSorted.map(([k])=>k),
   datasets:[{
     data:gRspSorted.map(([,v])=>v),
-    backgroundColor:'#2D3277',
+    backgroundColor:'#073763',
     borderRadius:2
   }]
 },options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{
@@ -664,7 +664,7 @@ mkDonut('cMC',Object.keys(countBy(cont,'m')).map(k=>k||'N/A'),Object.values(coun
 mkDonut('cFC',['Spot','Fixa'],[cSp,cFx],['#2D3277','#FFE600'],'fcont');
 mkDonut('cEC',['Com ETC','Sem ETC'],[cEt,cT-cEt],['#16a34a','#d1d5db'],'econt');
 const prC=countBy(cont,'p');
-new Chart(document.getElementById('cPR'),{type:'bar',data:{labels:Object.keys(prC),datasets:[{data:Object.values(prC),backgroundColor:['#dc2626','#ea580c','#16a34a','#2D3277','#9ca3af'],borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
+new Chart(document.getElementById('cPR'),{type:'bar',data:{labels:Object.keys(prC),datasets:[{data:Object.values(prC),backgroundColor:['#073763','#3d3d3d','#FFE600','#1a5fa8','#a0a0a0'],borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
 renderBars('bases-cont',countBy(cont,'b'),'blue');
 renderAssist('assist-cont',countBy(cont,'a'));
 cont.forEach(r=>{
@@ -712,7 +712,7 @@ const mRC=Object.entries(countBy(pCont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='')
 ins('insights-cross',[{c:'green',t:'🎯 Taxa de Conversão',x:`De <strong>${pT} pescados</strong>, <strong>${pCont.length} foram contratados</strong> — conversão de <strong>${conv}%</strong>.`},{c:'',t:'🗺️ Melhor Regional em Conversão',x:`<strong>${mRC?mRC[0]:'—'}</strong> teve mais conversões pesca→contratação.`},{c:'orange',t:'⏳ Pipeline Aberto',x:`<strong>${pipeline} motoristas</strong> aprovados no GUEP ainda não contratados.`},{c:'red',t:'🚫 Não Aprovados GUEP',x:`<strong>${gRe+gLi+gFa}</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc.`},{c:'green',t:'📈 Eficiência',x:`Conversão <strong>${conv}%</strong> pesca→contratação. GUEP aprovou <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'purple',t:'🔄 Recuperáveis',x:`<strong>${gLi+gFa} motoristas</strong> (licenciamento + falta doc) podem regularizar.`}]);
 
 const allR=[...new Set([...pesca.map(r=>r.r),...cont.map(r=>r.r)].filter(r=>r&&r!=='N/A'&&r!==''))];
-new Chart(document.getElementById('cCR'),{type:'bar',data:{labels:allR,datasets:[{label:'Pescados',data:allR.map(r=>pesca.filter(x=>x.r===r).length),backgroundColor:'rgba(45,50,119,0.7)',borderRadius:2},{label:'Contratados',data:allR.map(r=>cont.filter(x=>x.r===r).length),backgroundColor:'rgba(22,163,74,0.7)',borderRadius:2}]},options:scLeg()});
+new Chart(document.getElementById('cCR'),{type:'bar',data:{labels:allR,datasets:[{label:'Pescados',data:allR.map(r=>pesca.filter(x=>x.r===r).length),backgroundColor:'rgba(7,55,99,0.8)',borderRadius:2},{label:'Contratados',data:allR.map(r=>cont.filter(x=>x.r===r).length),backgroundColor:'rgba(255,230,0,0.9)',borderRadius:2}]},options:scLeg()});
 const aP=Object.keys(countBy(pesca,'a'));
 new Chart(document.getElementById('cCA'),{type:'bar',data:{labels:aP,datasets:[{label:'Pescados',data:aP.map(a=>pesca.filter(r=>r.a===a).length),backgroundColor:'rgba(45,50,119,0.7)',borderRadius:2},{label:'Convertidos',data:aP.map(a=>{
   const cpfs=new Set(pescaComCPF.filter(r=>r.a===a&&r.cpf).map(r=>r.cpf));
