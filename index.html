@@ -316,94 +316,37 @@
 </footer>
 
 <script>
-const GITHUB_USER = "gsjesus-design";
-const GITHUB_REPO = "relatorios-contratacao";
-const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
-
 const grid = document.getElementById("reports-grid");
 
-function nomePraData(filename) {
-  // Tenta extrair data do nome: relatorio_contratacao_26maio.html ou relatorio_27maio.html etc
-  const meses = {
-    janeiro:"01",fevereiro:"02",marco:"03",abril:"04",maio:"05",junho:"06",
-    julho:"07",agosto:"08",setembro:"09",outubro:"10",novembro:"11",dezembro:"12"
-  };
-  const match = filename.match(/(\d{1,2})([a-záéíóúç]+)/i);
-  if (match) {
-    const dia = match[1].padStart(2,"0");
-    const mes = meses[match[2].toLowerCase()] || "??";
-    const ano = new Date().getFullYear();
-    return `${dia}/${mes}/${ano}`;
-  }
-  return filename.replace(".html","").replace(/_/g," ");
+// =====================================================
+// ADICIONE NOVOS RELATÓRIOS AQUI
+// Formato: { arquivo: "nome.html", data: "DD/MM/AAAA" }
+// =====================================================
+const relatorios = [
+  { arquivo: "relatorio_26maio.html", data: "26/05/2026" },
+  // { arquivo: "relatorio_27maio.html", data: "27/05/2026" },
+];
+// =====================================================
+
+if (relatorios.length === 0) {
+  grid.innerHTML = `<div class="empty-card">
+    <strong>Nenhum relatório ainda</strong>
+    Adicione um relatório no array acima e faça upload no GitHub.
+  </div>`;
+} else {
+  const sorted = [...relatorios].reverse();
+  sorted.forEach((r, i) => {
+    const isLatest = i === 0;
+    grid.innerHTML += `
+      <a class="report-card" href="${r.arquivo}">
+        ${isLatest ? '<div class="report-badge">✦ Mais recente</div>' : '<div class="report-badge" style="opacity:0">·</div>'}
+        <div class="report-date">${r.data}</div>
+        <div class="report-title">Relatório Diário</div>
+        <div class="report-meta">Clique para abrir o relatório completo</div>
+        <div class="report-arrow">→</div>
+      </a>`;
+  });
 }
-
-async function carregarRelatorios() {
-  grid.innerHTML = `<div class="empty-card"><strong>Carregando...</strong>Buscando relatórios disponíveis.</div>`;
-
-  try {
-    const res = await fetch(API_URL, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
-    });
-
-    if (res.status === 403) {
-      const data = await res.json();
-      const isRateLimit = data.message && data.message.includes('rate limit');
-      grid.innerHTML = `<div class="empty-card">
-        <strong>${isRateLimit ? '⚠️ Limite de requisições atingido' : '⚠️ Acesso negado'}</strong>
-        ${isRateLimit
-          ? 'A API do GitHub tem limite de 60 requisições/hora sem autenticação. Aguarde alguns minutos e tente novamente.'
-          : 'Verifique se o repositório está como <strong>Public</strong> nas configurações do GitHub.'}
-        <br><br>
-        <button onclick="carregarRelatorios()" style="background:var(--blue);color:#fff;border:none;padding:8px 16px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border-radius:4px;margin-top:8px;">
-          Tentar novamente
-        </button>
-      </div>`;
-      return;
-    }
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const files = await res.json();
-
-    const relatorios = files
-      .filter(f => f.name.startsWith("relatorio") && f.name.endsWith(".html"))
-      .sort((a, b) => b.name.localeCompare(a.name));
-
-    if (relatorios.length === 0) {
-      grid.innerHTML = `<div class="empty-card">
-        <strong>Nenhum relatório ainda</strong>
-        Faça upload de um arquivo começando com <strong>relatorio</strong> e terminando em <strong>.html</strong>.
-      </div>`;
-      return;
-    }
-
-    grid.innerHTML = "";
-    relatorios.forEach((f, i) => {
-      const isLatest = i === 0;
-      const data = nomePraData(f.name);
-      grid.innerHTML += `
-        <a class="report-card" href="${f.name}">
-          ${isLatest ? '<div class="report-badge">✦ Mais recente</div>' : '<div class="report-badge" style="opacity:0">·</div>'}
-          <div class="report-date">${data}</div>
-          <div class="report-title">Relatório Diário</div>
-          <div class="report-meta">Clique para abrir o relatório completo</div>
-          <div class="report-arrow">→</div>
-        </a>`;
-    });
-
-  } catch (e) {
-    grid.innerHTML = `<div class="empty-card">
-      <strong>Erro ao carregar</strong>
-      Não foi possível buscar os arquivos. Erro: <code>${e.message}</code>
-      <br><br>
-      <button onclick="carregarRelatorios()" style="background:var(--blue);color:#fff;border:none;padding:8px 16px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border-radius:4px;margin-top:8px;">
-        Tentar novamente
-      </button>
-    </div>`;
-  }
-}
-
-carregarRelatorios();
 </script>
 
 </body>
