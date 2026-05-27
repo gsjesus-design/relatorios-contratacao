@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório de Contratações — 26/05/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161d;
+    --border: #1e2330;
+    --yellow: #FFE600;
+    --yellow-dim: rgba(255,230,0,0.12);
+    --blue: #2D3277;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --card-bg: #161921;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-badge {
+    background: var(--yellow);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 6px 12px;
+    letter-spacing: 1px;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .header-date {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  /* SECTION TITLES */
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .kpi-card:hover { border-color: var(--yellow); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--yellow);
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    color: var(--yellow);
+    line-height: 1;
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* CHARTS GRID */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+
+  .chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 28px;
+  }
+
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .chart-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 260px;
+  }
+
+  /* HORIZONTAL BAR — top bases */
+  .bases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .base-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .base-rank {
+    color: var(--yellow);
+    font-weight: 700;
+    width: 20px;
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .base-name {
+    width: 180px;
+    flex-shrink: 0;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .base-bar-wrap {
+    flex: 1;
+    background: var(--border);
+    height: 8px;
+    position: relative;
+  }
+
+  .base-bar-fill {
+    height: 100%;
+    background: var(--yellow);
+    transition: width .4s ease;
+  }
+
+  .base-count {
+    color: var(--muted);
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ASSISTANTS TABLE */
+  .assistants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+
+  .assistant-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color .2s;
+  }
+  .assistant-card:hover { border-color: var(--yellow); }
+
+  .assistant-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--yellow-dim);
+    border: 2px solid var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--yellow);
+    flex-shrink: 0;
+  }
+
+  .assistant-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .assistant-count {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* INSIGHTS */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .insight-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    padding: 20px;
+  }
+
+  .insight-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .insight-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .insight-text strong {
+    color: var(--text);
+  }
+
+  /* TABLE */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 48px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  thead tr {
+    border-bottom: 2px solid var(--yellow);
+  }
+
+  th {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  tbody tr:hover { background: var(--surface); }
+
+  td {
+    padding: 10px 14px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  td:first-child { color: var(--text); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .badge-spot { background: rgba(45,50,119,0.4); color: #7c85e8; border: 1px solid #2D3277; }
+  .badge-fixa { background: rgba(255,230,0,0.15); color: var(--yellow); border: 1px solid rgba(255,230,0,0.3); }
+  .badge-p0 { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .badge-p1 { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+  .badge-p2 { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-badge">MELI</div>
+    <div>
+      <div class="header-title">Relatório de Contratações</div>
+      <div class="header-date">26 de Maio de 2026</div>
+    </div>
+  </div>
+  <div class="header-date">ÁREA DE CONTRATAÇÃO</div>
+</header>
+
+<main>
+
+  <!-- KPIs -->
+  <div class="section-label">Visão Geral do Dia</div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Análises e Destaques</div>
+  <div class="insights-grid" id="insights-grid"></div>
+
+  <!-- CHARTS -->
+  <div class="section-label">Distribuições</div>
+  <div class="charts-grid">
+
+    <div class="chart-card">
+      <div class="chart-title">Tipo de Veículo</div>
+      <div class="chart-subtitle">Contratações por categoria de veículo</div>
+      <div class="chart-wrap"><canvas id="chartVeiculo"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Tipo de Milha</div>
+      <div class="chart-subtitle">Distribuição First Mile / Last Mile / Fulfillment</div>
+      <div class="chart-wrap"><canvas id="chartMilha"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Tipo de Frota</div>
+      <div class="chart-subtitle">Frota Spot vs Frota Fixa</div>
+      <div class="chart-wrap"><canvas id="chartFrota"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">ETC vs Não-ETC</div>
+      <div class="chart-subtitle">Contratações com e sem vínculo ETC</div>
+      <div class="chart-wrap"><canvas id="chartEtc"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- TOP 10 BASES -->
+  <div class="section-label">Top 10 Bases Contratadas</div>
+  <div class="chart-card" style="margin-bottom:48px">
+    <div class="chart-title">Ranking de Bases</div>
+    <div class="chart-subtitle">Quantidade de contratações por base (SVC/XD)</div>
+    <div class="bases-list" id="bases-list"></div>
+  </div>
+
+  <!-- POR ASSISTENTE -->
+  <div class="section-label">Contratações por Assistente</div>
+  <div class="assistants-grid" id="assistants-grid"></div>
+
+  <!-- PRIORIDADE -->
+  <div class="section-label">Distribuição por Prioridade</div>
+  <div class="charts-grid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="chart-card" style="grid-column: 1 / -1; max-width: 500px;">
+      <div class="chart-title">Prioridade das Demandas</div>
+      <div class="chart-subtitle">Classificação P0 / P1 / P2 / Frota Fixa</div>
+      <div class="chart-wrap"><canvas id="chartPrioridade"></canvas></div>
+    </div>
+  </div>
+
+  <!-- REGIONAL -->
+  <div class="section-label" style="margin-top:48px;">Contratações por Regional</div>
+  <div class="chart-card" style="margin-bottom:48px">
+    <div class="chart-title">Regionais</div>
+    <div class="chart-subtitle">Volume por regional operacional</div>
+    <div class="bases-list" id="regional-list"></div>
+  </div>
+
+  <!-- TABELA DETALHADA -->
+  <div class="section-label">Detalhamento — Todos os Registros</div>
+  <div class="table-wrap">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th>Assistente</th>
+          <th>ID Demanda</th>
+          <th>Nome</th>
+          <th>Base</th>
+          <th>Regional</th>
+          <th>Veículo</th>
+          <th>Frota</th>
+          <th>Milha</th>
+          <th>Prioridade</th>
+          <th>ETC</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  Relatório gerado em 26/05/2026 · Mercado Livre — Área de Contratação de Motoristas
+</footer>
+
+<main style="max-width:1400px;margin:0 auto;padding:0 40px 40px;">
+  <div class="section-label">Resumo para Envio no Grupo</div>
+  <div class="chart-card" style="margin-bottom:48px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div class="chart-title">📋 Resumo do Dia</div>
+        <div class="chart-subtitle">Texto pronto para copiar e enviar no grupo</div>
+      </div>
+      <button onclick="copyResumo()" style="background:var(--yellow);color:#000;border:none;padding:8px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:1px;">COPIAR</button>
+    </div>
+    <pre id="resumo-texto" style="background:var(--bg);border:1px solid var(--border);padding:24px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;"></pre>
+  </div>
+</main>
+
+<footer style="border-top:1px solid var(--border);padding:20px 40px;text-align:center;font-size:11px;color:var(--muted);letter-spacing:1px;font-family:'DM Mono',monospace;">
+  Relatório gerado em 26/05/2026 · Mercado Livre — Área de Contratação de Motoristas
+</footer>
+
+<script>
+const raw = [
+  {assistente:"Thiago",id:"FF_17131",nome:"SAMUEL ALVES DA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SMN1 - São Luís",regional:"NONECO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Claudio",id:"37008",nome:"GUSTAVO DE SOUZA SAIAGO GUERRA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSC2 - SC",regional:"SUL",etc:"",prioridade:"P2"},
+  {assistente:"Larissa",id:"33047",nome:"ANDREIA ATADEU DA SILVA",veiculo:"VAN",frota:"Frota Spot",milha:"Last Mile",base:"SJP1 - João Pessoa",regional:"NONECO",etc:"",prioridade:"P2"},
+  {assistente:"Mariana",id:"37563",nome:"COSMO FERREIRA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P0"},
+  {assistente:"Lucas",id:"32120",nome:"DERRICK FIRMINO DA GAMA",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP1 - ARE",regional:"SP2",etc:"ETC",prioridade:"P2"},
+  {assistente:"Claudio",id:"29477",nome:"FLAVIO TOFFOLI",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"ZN - Zona Norte",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Larissa",id:"36915",nome:"LUCIANA BERGO DE FREITAS CARVALHO",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P2"},
+  {assistente:"Mariana",id:"38160",nome:"ELIEZIO SILVA DE CASTRO",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Vinny",id:"37548",nome:"LUIZ GERALDO FERNANDES FILHO",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P0"},
+  {assistente:"Larissa",id:"39329",nome:"WILLIAN MORETTO BERALDO",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPR6 - Maringá",regional:"SUL",etc:"",prioridade:"P0"},
+  {assistente:"Lucas",id:"36774",nome:"EVERALDO MARCOS CARMO",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXGO1 - Goiânia",regional:"CO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lara",id:"FF_16803",nome:"RISTER STALLE MIRANDA DOS SANTOS",veiculo:"VAN",frota:"Frota Fixa",milha:"Last Mile",base:"SSC8 - Itajaí",regional:"SPC",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Lucas",id:"37516",nome:"MATHEUS HENRIQUE APARECIDO QUEIROZ DA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP11 - PRU",regional:"SPIO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"33914",nome:"JHAMES HENRIQUE SILVA DE JESUS CARVALHO",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP34 - Cotia",regional:"SP2",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"39104",nome:"THIAGO DIAS FERREIRA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SRJ1 - Cordovil",regional:"RIES",etc:"ETC",prioridade:"P0"},
+  {assistente:"Gabriel",id:"40817",nome:"MATHEUS FELIPE MOTA PIRES",veiculo:"HR",frota:"Frota Spot",milha:"Last Mile",base:"SBA3 - Vitória da Conquista",regional:"NONECO",etc:"",prioridade:"P2"},
+  {assistente:"Lara",id:"FF_17160",nome:"ALEXANDER DA SILVA",veiculo:"VAN",frota:"Frota Fixa",milha:"",base:"",regional:"",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Larissa",id:"36657",nome:"EVERTON APRIGIO DA SILVA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP2 - CPS",regional:"SPIO",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"39639",nome:"CARLOS EDUARDO DA GAMA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP4 - Ribeirão Preto",regional:"SPIO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"38382",nome:"KARINA DA SILVA DOS SANTOS",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"38426",nome:"THIAGO DE SOUZA ROCHA",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Joyce",id:"FF_17042",nome:"CASSIA MURIELI ARAUJO OLIVEIRA",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SSP22 - São Carlos",regional:"SPC",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Thiago",id:"FF_16612",nome:"WELLINGTON WILLIAN PEREIRA DA SILVA",veiculo:"VUC",frota:"Frota Fixa",milha:"Last Mile",base:"SSP30 - GRU",regional:"SPC",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Claudio",id:"38322",nome:"FABIANO MARTINS",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"38408",nome:"LEONARDO PEREIRA MARCONDES PORTO",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"38171",nome:"JOHN DA CRUZ LIMA",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Claudio",id:"42030",nome:"DAVIDSON DOS SANTOS",veiculo:"VUC",frota:"Frota Spot",milha:"Fulfillment",base:"BRRC01 - Perus",regional:"SPC",etc:"",prioridade:"P0"},
+  {assistente:"Mariana",id:"35789",nome:"FABIANO FERREIRA DOS SANTOS",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP11 - PRU",regional:"SPIO",etc:"",prioridade:"P1"},
+  {assistente:"Vinicius",id:"40930",nome:"PEDRO HENRIQUE DE ALMEIDA MENDES",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP8 - SJC",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Mariana",id:"37070",nome:"VINICIUS CARLOS DE MELO",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P1"},
+  {assistente:"Lara",id:"FF_16842",nome:"WESLLY BARBOSA DA SILVA",veiculo:"VAN",frota:"Frota Fixa",milha:"Last Mile",base:"SSP38 - Itupeva",regional:"SPIO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Vinicius",id:"41270",nome:"RENAN BENTO DA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SBA3 - Vitória da Conquista",regional:"NONECO",etc:"",prioridade:"P2"},
+  {assistente:"Vitor",id:"FF_16628",nome:"MURILO GABRIEL FERREIRA NUNES",veiculo:"VUC",frota:"Frota Fixa",milha:"Last Mile",base:"SSP20 - Sorocaba",regional:"SPC",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Vinicius",id:"42536",nome:"DIEGO HENRIQUE LEITE",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP31 - Barretos",regional:"SPIO",etc:"",prioridade:"P2"},
+  {assistente:"Gabriel",id:"38611",nome:"LUIZ CARLOS FERNANDES",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPR2 - Londrina",regional:"SUL",etc:"",prioridade:"P2"},
+  {assistente:"Mariana",id:"35837",nome:"WANDERSON DIAS SALOMAO",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP1 - ARE",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"32333",nome:"WILLIAM RAMOS DA COSTA",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Mariana",id:"38131",nome:"KLEBER PEREIRA BORGES",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Larissa",id:"41812",nome:"ANDREZA DAS GRAÇAS LIBERATO VIEIRA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP3 - CPS",regional:"SPIO",etc:"",prioridade:"P2"},
+  {assistente:"Vinicius",id:"41332",nome:"LEONILSON PEREIRA DOS SANTOS",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPR7 - Ponta Grossa",regional:"SUL",etc:"",prioridade:"P1"},
+  {assistente:"Lucas",id:"36907",nome:"CAIO QUIRINO",veiculo:"TRUCK",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Larissa",id:"33114",nome:"DANIEL RODRIGUES AZALI",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SMG15 - Contagem",regional:"MG",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"34963",nome:"VINICIUS NASCIMENTO DE OLIVEIRA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP30 - GRU",regional:"SP2",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lara",id:"FF_17161",nome:"JORGE LUIZ DE OLIVEIRA",veiculo:"VUC",frota:"Frota Fixa",milha:"",base:"",regional:"",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Thiago",id:"FF_17133",nome:"RICARDO AUGUSTO BEZERRA SILVA JUNIOR",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SMN1 - São Luís",regional:"NONECO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Claudio",id:"27909",nome:"DIOGENES DE LIMA LUCAS",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP5 - RAO",regional:"SPIO",etc:"",prioridade:"P1"},
+  {assistente:"Claudio",id:"31767",nome:"PAULO ROGERIO MARQUES DE LIMA",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXSP5 - RAO",regional:"SPIO",etc:"",prioridade:"P0"},
+  {assistente:"Lucas",id:"38382",nome:"ALINE JAMILE DA SILVA E SILVA VIANA",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"29097",nome:"WAGNER XAVIER DOS SANTOS JUNIOR",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Mariana",id:"38036",nome:"ALESSANDRO JOSE BARBOZA GUSMAO",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP2 - CPS",regional:"SPIO",etc:"",prioridade:"P2"},
+  {assistente:"Larissa",id:"38455",nome:"ARMANDO BOEMER ANTUNES DA COSTA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSC2 - SC",regional:"SUL",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"29097",nome:"DANIEL ROSARIO VELOSO",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"38420",nome:"YURI DE ALMEIDA CRUZ",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRRJ02 - São João de Meriti",regional:"RIES",etc:"ETC",prioridade:"P2"},
+  {assistente:"Claudio",id:"32810",nome:"CELSO APARECIDO DE GRANDE",veiculo:"VAN",frota:"Frota Spot",milha:"Fulfillment",base:"Full SSP22 - São Carlos",regional:"SPIO",etc:"",prioridade:"P0"},
+  {assistente:"Thiago",id:"FF_17090",nome:"EDNILSON PAULA SILVA",veiculo:"VAN",frota:"Frota Fixa",milha:"Last Mile",base:"SSP25 - Atibaia",regional:"SP1",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Gabriel",id:"35386",nome:"DOUGLAS HEFRAIN CELARIUS",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSC2 - Florianópolis",regional:"SUL",etc:"",prioridade:"P1"},
+  {assistente:"Larissa",id:"34605",nome:"GUILHERME BITTENCOURT MARTINS",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXSC2 - SC",regional:"SUL",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"32333",nome:"EDUARDO MARTINS DOS SANTOS JUNIOR",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"37740",nome:"VICTOR MOURA SILVA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P1"},
+  {assistente:"Larissa",id:"28813",nome:"HENRIQUE PEREIRA LOUZADA",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"36860",nome:"CAUE CASARINO VIEIRA",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Claudio",id:"37566",nome:"JUAREZ PARTELI ALVES DE MACEDO",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P0"},
+  {assistente:"Mariana",id:"27875",nome:"CHARLES VILELA EUZEBIO",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P1"},
+  {assistente:"Lucas",id:"38198",nome:"CLECIO LUAN SANTOS COSTA",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Larissa",id:"28363",nome:"ROBERTO ALBERGONI",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP1 - ARE",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"36308",nome:"EVERTON DAMIAO MORO",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P0"},
+  {assistente:"Lucas",id:"37519",nome:"RENAN DOS SANTOS UZUM",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP11 - PRU",regional:"SPIO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Gabriel",id:"42155",nome:"RAFAEL SCHULTZ",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SMG5 - Poços de Caldas",regional:"MG",etc:"",prioridade:"P1"},
+  {assistente:"Vinicius",id:"40032",nome:"LEIDIOMAR LUIS RODRIGUES",veiculo:"HR",frota:"Frota Spot",milha:"Last Mile",base:"SSP5 - ARE",regional:"SP2",etc:"",prioridade:"P1"},
+  {assistente:"Lucas",id:"37519",nome:"DANILO PARDINI DA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP11 - PRU",regional:"SPIO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Mariana",id:"37962",nome:"DANIEL BRITO DOS SANTOS",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP1 - ARE",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Larissa",id:"29171",nome:"DIEGO HONORATO DOS SANTOS",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP4 - SBC",regional:"SP1",etc:"",prioridade:"P2"},
+  {assistente:"Vinicius",id:"39739",nome:"DAVI DA SILVA VIEIRA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP8 - SJC",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Claudio",id:"37946",nome:"FERNANDO MATIAS",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP1 - ARE",regional:"SP2",etc:"",prioridade:"P2"},
+  {assistente:"Claudio",id:"36188",nome:"DANIEL FERREIRA",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXPR4 - Maringá",regional:"SUL",etc:"",prioridade:"P1"},
+  {assistente:"Larissa",id:"36481",nome:"FELIPE NERI CORREIA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXMG1 - MG",regional:"MG",etc:"",prioridade:"P1"},
+  {assistente:"Claudio",id:"32363",nome:"JOSE ADJAILSON DA SILVA",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"",prioridade:"P2"},
+  {assistente:"Vinicius",id:"41274",nome:"THAMIRIS DA SILVA DANTAS",veiculo:"HR",frota:"Frota Spot",milha:"Last Mile",base:"SBA3 - Vitória da Conquista",regional:"NONECO",etc:"",prioridade:"P2"},
+  {assistente:"Claudio",id:"36985",nome:"MARCO ROBERTO LOURENCO DA SILVA",veiculo:"VAN",frota:"Frota Spot",milha:"First Mile",base:"BRXSP4 - SBC",regional:"SP1",etc:"",prioridade:"P2"},
+  {assistente:"Joyce",id:"FF_16911",nome:"JACSON ADRIEL DE RODRIGUES ESQUERDO",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SRS4 - Caxias do Sul",regional:"SUL",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Gabriel",id:"40301",nome:"GABRIEL JUNIO DE AQUINO SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SMG1 - Contagem",regional:"MG",etc:"",prioridade:"P0"},
+  {assistente:"Joyce",id:"FF_16782",nome:"JULIANA AMORIM DE OLIVEIRA MELLO",veiculo:"VAN",frota:"Frota Fixa",milha:"Last Mile",base:"SSP20 - Sorocaba",regional:"SPC",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Lucas",id:"38172",nome:"ELIAS FERREIRA DO PRADO",veiculo:"MÉDIO",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"37736",nome:"(sem nome)",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P1"},
+  {assistente:"Gabriel",id:"30490",nome:"ALBERTO GOMES NETO",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP23 - Mogi das Cruzes",regional:"SP2",etc:"",prioridade:"P0"},
+  {assistente:"Lucas",id:"38157",nome:"MATHEUS DA SILVA FERREIRA",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"33253",nome:"MARCOS ANTONIO DOS SANTOS",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPE1 - Recife",regional:"NONECO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lucas",id:"36284",nome:"ARLETON FERNANDO SANTOS DA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPE1 - Recife",regional:"NONECO",etc:"ETC",prioridade:"P2"},
+  {assistente:"Lara",id:"FF_16926",nome:"WENDERSON SILVA DOS SANTOS",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SRS8 - Sapucaia do Sul",regional:"SUL",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Thiago",id:"FF_17134",nome:"RONALDO DE JESUS DUTRA",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SMN1 - São Luís",regional:"NONECO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Joyce",id:"FF_17051",nome:"HANA KAROLINA PIRES DE OLIVEIRA",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SMR1 - Cuiabá",regional:"NONECO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Lucas",id:"33491",nome:"RODRIGO CLEMENTIINO DE OLIVEIRA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SRN1 - Natal",regional:"NONECO",etc:"ETC",prioridade:"P1"},
+  {assistente:"Lucas",id:"33980",nome:"FERNANDO DA SILVA LASZLO",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP48 - Jaguaré",regional:"SP2",etc:"ETC",prioridade:"P0"},
+  {assistente:"Lucas",id:"36985",nome:"ANDERSON RUFINO BRAGA DE ANDRADE",veiculo:"VUC",frota:"Frota Spot",milha:"First Mile",base:"BRXSP4 - SBC",regional:"SP1",etc:"ETC",prioridade:"P2"},
+  {assistente:"Larissa",id:"37412",nome:"THIAGO DA SILVA BRAGA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SPE1 - Recife",regional:"NONECO",etc:"",prioridade:"P2"},
+  {assistente:"Lucas",id:"36858",nome:"GUSTAVO HENRIQUE DOS SANTOS SIMAO",veiculo:"HR",frota:"Frota Spot",milha:"First Mile",base:"BRXSP10 - GRU II",regional:"SPC",etc:"ETC",prioridade:"P2"},
+  {assistente:"Joyce",id:"FF_17048",nome:"JOAO PEDRO BATISTA CARDOSO",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SDF1 - Brasília",regional:"NONECO",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Vinicius",id:"41698",nome:"LUCILAINE OLIVEIRA SILVA",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP9 - Limeira",regional:"SP1",etc:"",prioridade:"P2"},
+  {assistente:"Joyce",id:"FF_17162",nome:"MARLON HENRIQUE BRAVO DIAS",veiculo:"VAN",frota:"Frota Fixa",milha:"",base:"",regional:"",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Thiago",id:"FF_17090",nome:"FELIPE BASTOS FAGUNDES",veiculo:"UTILITÁRIO",frota:"Frota Fixa",milha:"Last Mile",base:"SSP25 - Atibaia",regional:"SP1",etc:"",prioridade:"Frota Fixa"},
+  {assistente:"Vinicius",id:"41696",nome:"MATHEUS BULSONI DE ANDRADE",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP9 - Limeira",regional:"SP1",etc:"",prioridade:"P2"},
+  {assistente:"Vinicius",id:"38651",nome:"GILBERTO JOSE SOARES",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SBA6 - Salvador",regional:"NONECO",etc:"",prioridade:"P1"},
+  {assistente:"Vinicius",id:"39707",nome:"FLAVIO PEREIRA DE ARAUJO",veiculo:"UTILITÁRIO",frota:"Frota Spot",milha:"Last Mile",base:"SSP5 - ARE",regional:"SP2",etc:"",prioridade:"P1"},
+];
+
+// ---- COUNTS ----
+const total = raw.length;
+const spot = raw.filter(r=>r.frota==="Frota Spot").length;
+const fixa = raw.filter(r=>r.frota==="Frota Fixa").length;
+const etcCount = raw.filter(r=>r.etc==="ETC").length;
+const firstMile = raw.filter(r=>r.milha==="First Mile").length;
+const lastMile = raw.filter(r=>r.milha==="Last Mile").length;
+const fulfillment = raw.filter(r=>r.milha==="Fulfillment").length;
+
+function count(arr, key) {
+  return arr.reduce((acc,r)=>{
+    const v = r[key]||"N/A";
+    acc[v]=(acc[v]||0)+1;
+    return acc;
+  },{});
+}
+
+const veiculoCount = count(raw,"veiculo");
+const milhaCount = count(raw,"milha");
+const frotaCount = count(raw,"frota");
+const etcMap = {"Com ETC": etcCount, "Sem ETC": total-etcCount};
+const prioCount = count(raw,"prioridade");
+const assistCount = count(raw,"assistente");
+const baseCount = count(raw,"base");
+const regionalCount = count(raw,"regional");
+
+// ---- KPIs ----
+const kpis = [
+  {label:"Total Contratado", value: total, sub:"registros no dia"},
+  {label:"Frota Spot", value: spot, sub:`${Math.round(spot/total*100)}% do total`},
+  {label:"Frota Fixa", value: fixa, sub:`${Math.round(fixa/total*100)}% do total`},
+  {label:"Com ETC", value: etcCount, sub:`${Math.round(etcCount/total*100)}% do total`},
+  {label:"First Mile", value: firstMile, sub:`${Math.round(firstMile/total*100)}% das milhas`},
+  {label:"Last Mile", value: lastMile, sub:`${Math.round(lastMile/total*100)}% das milhas`},
+  {label:"Assistentes Ativos", value: Object.keys(assistCount).length, sub:"no dia"},
+  {label:"Bases Atendidas", value: Object.keys(baseCount).filter(b=>b&&b!=="N/A"&&b!=="").length, sub:"bases distintas"},
+];
+
+const kpiGrid = document.getElementById("kpi-grid");
+kpis.forEach(k=>{
+  kpiGrid.innerHTML += `<div class="kpi-card">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.value}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`;
+});
+
+// ---- INSIGHTS ----
+const topBase = Object.entries(baseCount).filter(([b])=>b&&b!=="").sort((a,b)=>b[1]-a[1])[0];
+const topAssist = Object.entries(assistCount).sort((a,b)=>b[1]-a[1])[0];
+const topVeiculo = Object.entries(veiculoCount).sort((a,b)=>b[1]-a[1])[0];
+const topRegional = Object.entries(regionalCount).filter(([r])=>r&&r!=="N/A"&&r!=="").sort((a,b)=>b[1]-a[1])[0];
+const p0 = prioCount["P0"]||0;
+const p2 = prioCount["P2"]||0;
+
+const insights = [
+  {title:"🏆 Base Mais Demandada", text:`<strong>${topBase[0]}</strong> liderou o dia com <strong>${topBase[1]} contratações</strong>. BRXSP10 - GRU II concentra grande volume de demandas First Mile.`},
+
+  {title:"🚚 Frota Dominante", text:`A <strong>Frota Spot</strong> representou <strong>${Math.round(spot/total*100)}%</strong> das contratações. Frota Fixa respondeu por ${Math.round(fixa/total*100)}%.`},
+  {title:"📦 Tipo de Veículo", text:`<strong>${topVeiculo[0]}</strong> foi o veículo mais contratado com <strong>${topVeiculo[1]} unidades</strong>, seguido de VUC e VAN.`},
+  {title:"🗺️ Regional Líder", text:`A regional <strong>${topRegional[0]}</strong> concentrou o maior volume de contratações do dia, refletindo alta demanda na região.`},
+  {title:"⚡ Prioridade P0", text:`<strong>${p0} contratações P0</strong> foram realizadas no dia, demandas urgentes que exigem ação imediata. P2 representa ${p2} registros.`},
+  {title:"🔗 Penetração ETC", text:`<strong>${etcCount} contratações (${Math.round(etcCount/total*100)}%)</strong> foram realizadas via ETC, indicando boa adesão ao modelo de transportadoras parceiras.`},
+  {title:"📍 Diversidade Geográfica", text:`Foram atendidas <strong>${Object.keys(baseCount).filter(b=>b&&b!=="").length} bases distintas</strong> em múltiplas regionais, demonstrando cobertura nacional.`},
+];
+
+const insightsGrid = document.getElementById("insights-grid");
+insights.forEach(i=>{
+  insightsGrid.innerHTML += `<div class="insight-card">
+    <div class="insight-title">${i.title}</div>
+    <div class="insight-text">${i.text}</div>
+  </div>`;
+});
+
+// ---- CHART CONFIG ----
+const chartDefaults = {
+  plugins: { legend: { labels: { color: '#9ca3af', font: { family: 'DM Mono', size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#6b7280', font: { family: 'DM Mono', size: 10 } }, grid: { color: '#1e2330' } },
+    y: { ticks: { color: '#6b7280', font: { family: 'DM Mono', size: 10 } }, grid: { color: '#1e2330' } }
+  }
+};
+
+const COLORS = ['#FFE600','#2D3277','#22c55e','#ef4444','#fb923c','#818cf8','#34d399','#f472b6','#60a5fa','#a78bfa'];
+
+// VEICULO
+new Chart(document.getElementById('chartVeiculo'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(veiculoCount),
+    datasets: [{
+      data: Object.values(veiculoCount),
+      backgroundColor: COLORS,
+      borderRadius: 2,
+    }]
+  },
+  options: { ...chartDefaults, plugins: { legend: { display: false } } }
+});
+
+// MILHA
+new Chart(document.getElementById('chartMilha'), {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(milhaCount).map(k=>k||"N/A"),
+    datasets: [{
+      data: Object.values(milhaCount),
+      backgroundColor: ['#FFE600','#2D3277','#22c55e','#6b7280'],
+      borderWidth: 0,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#9ca3af', font: { family: 'DM Mono', size: 11 } } } },
+    cutout: '65%'
+  }
+});
+
+// FROTA
+new Chart(document.getElementById('chartFrota'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Frota Spot','Frota Fixa'],
+    datasets: [{
+      data: [spot, fixa],
+      backgroundColor: ['#2D3277','#FFE600'],
+      borderWidth: 0,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#9ca3af', font: { family: 'DM Mono', size: 11 } } } },
+    cutout: '65%'
+  }
+});
+
+// ETC
+new Chart(document.getElementById('chartEtc'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Com ETC','Sem ETC'],
+    datasets: [{
+      data: [etcCount, total-etcCount],
+      backgroundColor: ['#22c55e','#374151'],
+      borderWidth: 0,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: '#9ca3af', font: { family: 'DM Mono', size: 11 } } } },
+    cutout: '65%'
+  }
+});
+
+// PRIORIDADE
+new Chart(document.getElementById('chartPrioridade'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(prioCount),
+    datasets: [{
+      data: Object.values(prioCount),
+      backgroundColor: ['#ef4444','#fb923c','#22c55e','#FFE600','#6b7280'],
+      borderRadius: 2,
+    }]
+  },
+  options: { ...chartDefaults, indexAxis: 'y', plugins: { legend: { display: false } } }
+});
+
+// TOP 10 BASES
+const baseSorted = Object.entries(baseCount)
+  .filter(([b])=>b&&b!=="")
+  .sort((a,b)=>b[1]-a[1])
+  .slice(0,10);
+const maxBase = baseSorted[0][1];
+const basesList = document.getElementById("bases-list");
+baseSorted.forEach(([name,count],i)=>{
+  basesList.innerHTML += `<div class="base-row">
+    <div class="base-rank">${i+1}</div>
+    <div class="base-name">${name}</div>
+    <div class="base-bar-wrap"><div class="base-bar-fill" style="width:${Math.round(count/maxBase*100)}%"></div></div>
+    <div class="base-count">${count}</div>
+  </div>`;
+});
+
+// ASSISTENTES
+const assistSorted = Object.entries(assistCount).sort((a,b)=>b[1]-a[1]);
+const assistGrid = document.getElementById("assistants-grid");
+assistSorted.forEach(([name,c])=>{
+  assistGrid.innerHTML += `<div class="assistant-card">
+    <div class="assistant-avatar">${name[0]}</div>
+    <div>
+      <div class="assistant-name">${name}</div>
+      <div class="assistant-count">${c} contratação${c>1?'ões':''}</div>
+    </div>
+  </div>`;
+});
+
+// REGIONAL
+const regSorted = Object.entries(regionalCount)
+  .filter(([r])=>r&&r!=="N/A"&&r!=="")
+  .sort((a,b)=>b[1]-a[1]);
+const maxReg = regSorted[0]?regSorted[0][1]:1;
+const regList = document.getElementById("regional-list");
+regSorted.forEach(([name,c],i)=>{
+  regList.innerHTML += `<div class="base-row">
+    <div class="base-rank">${i+1}</div>
+    <div class="base-name">${name}</div>
+    <div class="base-bar-wrap"><div class="base-bar-fill" style="width:${Math.round(c/maxReg*100)}%"></div></div>
+    <div class="base-count">${c}</div>
+  </div>`;
+});
+
+// TABLE
+const tbody = document.getElementById("table-body");
+raw.forEach(r=>{
+  const frotaBadge = r.frota==="Frota Fixa"
+    ? `<span class="badge badge-fixa">FIXA</span>`
+    : `<span class="badge badge-spot">SPOT</span>`;
+  let prioBadge = r.prioridade;
+  if(r.prioridade==="P0") prioBadge = `<span class="badge badge-p0">P0</span>`;
+  if(r.prioridade==="P1") prioBadge = `<span class="badge badge-p1">P1</span>`;
+  if(r.prioridade==="P2") prioBadge = `<span class="badge badge-p2">P2</span>`;
+  if(r.prioridade==="Frota Fixa") prioBadge = `<span class="badge badge-fixa">FF</span>`;
+  const etcBadge = r.etc==="ETC"?`<span style="color:#22c55e;font-size:10px">✓ ETC</span>`:`<span style="color:#374151;font-size:10px">—</span>`;
+
+  tbody.innerHTML += `<tr>
+    <td>${r.assistente}</td>
+    <td style="color:#6b7280">${r.id}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${r.nome}</td>
+    <td>${r.base||"—"}</td>
+    <td>${r.regional||"—"}</td>
+    <td>${r.veiculo}</td>
+    <td>${frotaBadge}</td>
+    <td>${r.milha||"—"}</td>
+    <td>${prioBadge}</td>
+    <td>${etcBadge}</td>
+  </tr>`;
+});
+
+// ---- RESUMO PARA GRUPO ----
+const topBase2 = Object.entries(baseCount).filter(([b])=>b&&b!=="").sort((a,b)=>b[1]-a[1])[0];
+const topAssist2 = Object.entries(assistCount).sort((a,b)=>b[1]-a[1])[0];
+const topVeiculo2 = Object.entries(veiculoCount).sort((a,b)=>b[1]-a[1])[0];
+const p0c = prioCount["P0"]||0;
+const p1c = prioCount["P1"]||0;
+const p2c = prioCount["P2"]||0;
+const ffC = prioCount["Frota Fixa"]||0;
+const topRegional2 = Object.entries(regionalCount).filter(([r])=>r&&r!=="N/A"&&r!=="").sort((a,b)=>b[1]-a[1]);
+
+const resumo = `📦 *RELATÓRIO DE CONTRATAÇÕES — 26/05/2026*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 *VISÃO GERAL*
+• Total contratado no dia: *${total} motoristas*
+• Frota Spot: *${spot}* (${Math.round(spot/total*100)}%)
+• Frota Fixa: *${fixa}* (${Math.round(fixa/total*100)}%)
+• Com ETC: *${etcCount}* (${Math.round(etcCount/total*100)}%)
+
+📍 *DISTRIBUIÇÃO POR MILHA*
+• First Mile: *${firstMile}*
+• Last Mile: *${lastMile}*
+• Fulfillment: *${fulfillment}*
+
+🚚 *TIPO DE VEÍCULO*
+${Object.entries(veiculoCount).sort((a,b)=>b[1]-a[1]).map(([v,c])=>`• ${v}: *${c}*`).join('\n')}
+
+⚡ *PRIORIDADE DAS DEMANDAS*
+• P0 (urgente): *${p0c}*
+• P1: *${p1c}*
+• P2: *${p2c}*
+• Frota Fixa: *${ffC}*
+
+🏆 *TOP 5 BASES DO DIA*
+${Object.entries(baseCount).filter(([b])=>b&&b!=="").sort((a,b)=>b[1]-a[1]).slice(0,5).map(([b,c],i)=>`${i+1}. ${b}: *${c}*`).join('\n')}
+
+🗺️ *REGIONAIS*
+${topRegional2.map(([r,c])=>`• ${r}: *${c}*`).join('\n')}
+
+🔍 *DESTAQUES*
+• Base mais demandada: *${topBase2[0]}* (${topBase2[1]} contratações)
+• Veículo mais contratado: *${topVeiculo2[0]}* (${topVeiculo2[1]} unidades)
+• Bases distintas atendidas: *${Object.keys(baseCount).filter(b=>b&&b!=="").length}*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Área de Contratação de Motoristas · Mercado Livre`;
+
+document.getElementById("resumo-texto").textContent = resumo;
+
+function copyResumo() {
+  const text = document.getElementById("resumo-texto").textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.querySelector('button[onclick="copyResumo()"]');
+    btn.textContent = "COPIADO ✓";
+    btn.style.background = "#22c55e";
+    setTimeout(()=>{ btn.textContent = "COPIAR"; btn.style.background = "var(--yellow)"; }, 2000);
+  });
+}
+</script>
+
+<!-- RESUMO PARA GRUPO -->
+<style>
+  .resumo-section { margin-top: 48px; }
+</style>
+
+</body>
+</html>
