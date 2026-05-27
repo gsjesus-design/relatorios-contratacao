@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Diário — 26/05/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{--bg:#f5f5f0;--surface:#fff;--border:#e2e2db;--yellow:#FFE600;--yellow-dim:rgba(255,230,0,0.2);--blue:#2D3277;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--text:#1a1a2e;--muted:#6b7280;--card-bg:#fff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  header{background:var(--blue);border-bottom:3px solid var(--yellow);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo-badge{background:var(--yellow);color:#000;font-weight:800;font-size:13px;padding:6px 12px;border-radius:4px;letter-spacing:1px;}
+  .logo-area{display:flex;align-items:center;gap:14px;}
+  .header-title{font-weight:700;font-size:18px;color:#fff;}
+  .header-date{color:rgba(255,255,255,0.6);font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+  main{max-width:1400px;margin:0 auto;padding:40px;}
+  .tabs{display:flex;gap:0;margin-bottom:40px;border-bottom:2px solid var(--border);overflow-x:auto;}
+  .tab{padding:14px 24px;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .tab-content{display:none;}.tab-content.active{display:block;}
+  .section-label{font-weight:600;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:16px;margin-bottom:40px;}
+  .kpi-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:20px 18px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);}
+  .kpi-card.green::before{background:var(--green);}.kpi-card.red::before{background:var(--red);}.kpi-card.orange::before{background:var(--orange);}.kpi-card.purple::before{background:var(--purple);}
+  .kpi-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .kpi-value{font-weight:800;font-size:32px;color:var(--blue);line-height:1;}
+  .kpi-card.green .kpi-value{color:var(--green);}.kpi-card.red .kpi-value{color:var(--red);}.kpi-card.orange .kpi-value{color:var(--orange);}.kpi-card.purple .kpi-value{color:var(--purple);}
+  .kpi-sub{font-size:11px;color:var(--muted);margin-top:6px;}
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px;}
+  @media(max-width:900px){.charts-grid{grid-template-columns:1fr;}}
+  .chart-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .chart-title{font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px;}
+  .chart-subtitle{font-size:11px;color:var(--muted);margin-bottom:22px;}
+  .chart-wrap{position:relative;height:250px;}
+  .bar-list{display:flex;flex-direction:column;gap:10px;}
+  .bar-row{display:flex;align-items:center;gap:12px;font-size:12px;}
+  .bar-rank{color:var(--blue);font-weight:700;width:20px;flex-shrink:0;}
+  .bar-name{width:190px;flex-shrink:0;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-wrap{flex:1;background:#e8e8e2;height:8px;border-radius:4px;}
+  .bar-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+  .bar-fill.blue{background:var(--blue);}.bar-fill.green{background:var(--green);}
+  .bar-count{color:var(--muted);width:24px;text-align:right;flex-shrink:0;}
+  .assistants-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:14px;margin-bottom:40px;}
+  .assistant-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .assistant-avatar{width:38px;height:38px;border-radius:50%;background:var(--yellow-dim);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--blue);flex-shrink:0;}
+  .assistant-name{font-weight:700;font-size:13px;color:var(--text);}.assistant-count{font-size:11px;color:var(--muted);}
+  .insights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:40px;}
+  .insight-card{background:var(--card-bg);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .insight-card.green{border-left-color:var(--green);}.insight-card.red{border-left-color:var(--red);}.insight-card.orange{border-left-color:var(--orange);}.insight-card.purple{border-left-color:var(--purple);}
+  .insight-title{font-weight:700;font-size:11px;color:var(--blue);text-transform:uppercase;margin-bottom:6px;}
+  .insight-card.green .insight-title{color:var(--green);}.insight-card.red .insight-title{color:var(--red);}.insight-card.orange .insight-title{color:var(--orange);}.insight-card.purple .insight-title{color:var(--purple);}
+  .insight-text{font-size:12px;color:var(--muted);line-height:1.7;}.insight-text strong{color:var(--text);}
+  .funnel{display:flex;flex-direction:column;gap:0;margin-bottom:40px;max-width:700px;}
+  .funnel-step{background:var(--card-bg);border:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;gap:20px;position:relative;}
+  .funnel-step:not(:last-child)::after{content:'\2193';position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:20px;z-index:1;}
+  .funnel-step+.funnel-step{border-top:none;}.funnel-step:first-child{border-radius:8px 8px 0 0;}.funnel-step:last-child{border-radius:0 0 8px 8px;}
+  .funnel-num{font-weight:800;font-size:32px;color:var(--blue);min-width:56px;}
+  .funnel-label{font-weight:600;font-size:14px;color:var(--text);}.funnel-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .funnel-pct{margin-left:auto;font-weight:700;font-size:18px;color:var(--green);}
+  .cross-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:40px;}
+  @media(max-width:900px){.cross-grid{grid-template-columns:1fr;}}
+  .cross-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:28px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .cross-value{font-weight:800;font-size:48px;line-height:1;margin-bottom:8px;}.cross-label{font-size:12px;color:var(--muted);font-weight:500;}.cross-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+  .table-wrap{overflow-x:auto;margin-bottom:40px;border-radius:8px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  table{width:100%;border-collapse:collapse;font-size:12px;background:var(--card-bg);}
+  thead tr{background:var(--blue);border-bottom:2px solid var(--yellow);}
+  th{font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff;padding:12px 14px;text-align:left;white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}tbody tr:hover{background:#f0f0ea;}
+  td{padding:10px 14px;color:var(--muted);white-space:nowrap;}td:first-child{color:var(--text);font-weight:500;}
+  .badge{display:inline-block;padding:2px 8px;font-size:10px;font-weight:600;border-radius:4px;}
+  .b-aprov{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.3);}
+  .b-reprov{background:rgba(220,38,38,.1);color:var(--red);border:1px solid rgba(220,38,38,.3);}
+  .b-licen{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
+  .b-pend{background:rgba(107,114,128,.1);color:var(--muted);border:1px solid rgba(107,114,128,.3);}
+  .b-falta{background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.3);}
+  .b-spot{background:rgba(45,50,119,.1);color:var(--blue);border:1px solid rgba(45,50,119,.3);}
+  .b-fixa{background:rgba(255,230,0,.3);color:#8a7a00;border:1px solid rgba(200,180,0,.4);}
+  .b-p0{background:rgba(220,38,38,.1);color:var(--red);border:1px solid rgba(220,38,38,.3);}
+  .b-p1{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
+  .b-p2{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.3);}
+  .b-naocont{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
+  pre#resumo-texto{background:#f5f5f0;border:1px solid var(--border);padding:24px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;border-radius:6px;}
+  footer{border-top:1px solid var(--border);padding:20px 40px;text-align:center;font-size:11px;color:var(--muted);background:var(--surface);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-area">
+    <div class="logo-badge">MELI</div>
+    <div>
+      <div class="header-title">Relatório Diário — Pesca · GUEP · Contratação</div>
+      <div class="header-date">26 de Maio de 2026</div>
+    </div>
+  </div>
+  <div class="header-date">ÁREA DE CONTRATAÇÃO</div>
+</header>
+<main>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('pesca')">🎣 Pesca</div>
+    <div class="tab" onclick="showTab('guep')">🔍 GUEP</div>
+    <div class="tab" onclick="showTab('contratacao')">✅ Contratação</div>
+    <div class="tab" onclick="showTab('cruzamento')">🔀 Cruzamento</div>
+    <div class="tab" onclick="showTab('resumo')">📋 Resumo</div>
+  </div>
+  <div class="tab-content active" id="tab-pesca">
+    <div class="section-label">KPIs — Pesca</div><div class="kpi-grid" id="kpi-pesca"></div>
+    <div class="section-label">Análises — Pesca</div><div class="insights-grid" id="insights-pesca"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Tipo de Veículo</div><div class="chart-subtitle">Por categoria</div><div class="chart-wrap"><canvas id="cVP"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Tipo de Milha</div><div class="chart-subtitle">First / Last / Fulfillment</div><div class="chart-wrap"><canvas id="cMP"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Regional</div><div class="chart-subtitle">Volume por regional</div><div class="chart-wrap"><canvas id="cRP"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Status GUEP (gerador)</div><div class="chart-subtitle">Preenchido pelo time de pesca</div><div class="chart-wrap"><canvas id="cGP"></canvas></div></div>
+    </div>
+    <div class="section-label">Top 10 Bases</div><div class="chart-card" style="margin-bottom:40px"><div class="bar-list" id="bases-pesca"></div></div>
+    <div class="section-label">Por Assistente</div><div class="assistants-grid" id="assist-pesca"></div>
+    <div class="section-label">Detalhamento</div>
+    <div class="table-wrap"><table><thead><tr><th>Assistente</th><th>Nome</th><th>Base</th><th>Regional</th><th>Veículo</th><th>Milha</th><th>GUEP Gerador</th></tr></thead><tbody id="tb-pesca"></tbody></table></div>
+  </div>
+  <div class="tab-content" id="tab-guep">
+    <div class="section-label">KPIs — GUEP</div><div class="kpi-grid" id="kpi-guep"></div>
+    <div class="section-label">Análises — GUEP</div><div class="insights-grid" id="insights-guep"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Resultado GUEP</div><div class="chart-subtitle">Distribuição por status oficial</div><div class="chart-wrap"><canvas id="cGS"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Por Responsável</div><div class="chart-subtitle">Volume validado por assistente</div><div class="chart-wrap"><canvas id="cGR"></canvas></div></div>
+    </div>
+    <div class="section-label">Por Responsável</div><div class="assistants-grid" id="assist-guep"></div>
+    <div class="section-label">Detalhamento</div>
+    <div class="table-wrap"><table><thead><tr><th>Responsável</th><th>Nome Motorista</th><th>CPF</th><th>Placa</th><th>FF/ETC</th><th>Status GUEP</th></tr></thead><tbody id="tb-guep"></tbody></table></div>
+  </div>
+  <div class="tab-content" id="tab-contratacao">
+    <div class="section-label">KPIs — Contratação</div><div class="kpi-grid" id="kpi-cont"></div>
+    <div class="section-label">Análises — Contratação</div><div class="insights-grid" id="insights-cont"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Tipo de Veículo</div><div class="chart-subtitle">Por categoria</div><div class="chart-wrap"><canvas id="cVC"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Tipo de Milha</div><div class="chart-subtitle">First / Last / Fulfillment</div><div class="chart-wrap"><canvas id="cMC"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Tipo de Frota</div><div class="chart-subtitle">Spot vs Fixa</div><div class="chart-wrap"><canvas id="cFC"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">ETC vs Não-ETC</div><div class="chart-subtitle">Com e sem vínculo ETC</div><div class="chart-wrap"><canvas id="cEC"></canvas></div></div>
+    </div>
+    <div class="section-label">Top 10 Bases</div><div class="chart-card" style="margin-bottom:40px"><div class="bar-list" id="bases-cont"></div></div>
+    <div class="section-label">Por Assistente</div><div class="assistants-grid" id="assist-cont"></div>
+    <div class="section-label">Prioridade</div><div class="chart-card" style="margin-bottom:40px;max-width:500px"><div class="chart-wrap"><canvas id="cPR"></canvas></div></div>
+    <div class="section-label">Detalhamento</div>
+    <div class="table-wrap"><table><thead><tr><th>Assistente</th><th>ID</th><th>Nome</th><th>Base</th><th>Regional</th><th>Veículo</th><th>Frota</th><th>Milha</th><th>Prioridade</th><th>ETC</th></tr></thead><tbody id="tb-cont"></tbody></table></div>
+  </div>
+  <div class="tab-content" id="tab-cruzamento">
+    <div class="section-label">Funil Pesca → Contratação</div><div class="funnel" id="funnel"></div>
+    <div class="section-label" style="margin-top:48px">Métricas de Conversão</div><div class="cross-grid" id="cross-metrics"></div>
+    <div class="section-label">Análises</div><div class="insights-grid" id="insights-cross"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Conversão por Regional</div><div class="chart-subtitle">Pescados vs Contratados</div><div class="chart-wrap"><canvas id="cCR"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Conversão por Assistente Pesca</div><div class="chart-subtitle">Pescados vs convertidos</div><div class="chart-wrap"><canvas id="cCA"></canvas></div></div>
+    </div>
+    <div class="section-label">Pipeline Aberto — Aprovados não Contratados</div>
+    <div class="table-wrap"><table><thead><tr><th>Assistente Pesca</th><th>Nome</th><th>Base</th><th>Regional</th><th>Veículo</th><th>GUEP Gerador</th><th>Status</th></tr></thead><tbody id="tb-pipeline"></tbody></table></div>
+  </div>
+  <div class="tab-content" id="tab-resumo">
+    <div class="section-label">Resumo para Envio no Grupo</div>
+    <div class="chart-card" style="margin-bottom:40px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div><div class="chart-title">📋 Resumo do Dia</div><div class="chart-subtitle">Texto pronto para copiar e enviar no grupo</div></div>
+        <button onclick="copyResumo()" style="background:var(--yellow);color:#000;border:none;padding:8px 18px;font-weight:700;font-size:12px;cursor:pointer;border-radius:4px;">COPIAR</button>
+      </div>
+      <pre id="resumo-texto"></pre>
+    </div>
+  </div>
+</main>
+<footer>Relatório gerado em 26/05/2026 · Mercado Livre — Área de Contratação de Motoristas</footer>
+<script>
+
+const pesca=[
+  {a:"Italo",n:"ANDREA DE SOUZA LEITE",c:"10245845771",v:"UTILITÁRIO",m:"Last Mile",b:"SRJ5 - Petrópolis",r:"RIES",g:"APROVADO"},
+  {a:"Italo",n:"EMERSON RODRIGO MARQUES",c:"35483473809",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"WELLINGTON PEREIRA DOS SANTOS",c:"40383043883",v:"UTILITÁRIO",m:"Last Mile",b:"SSP23 - Mogi das Cruzes",r:"SP2",g:"APROVADO"},
+  {a:"Gabrielle",n:"ALEXANDRE NERIS SANCHES",c:"47319959810",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Lucas",n:"DERRICK FIRMINO DA GAMA",c:"36668523862",v:"VUC",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Gabrielle",n:"FRANCISCO NADIRCIO PRIM",c:"03082116930",v:"MÉDIO",m:"First Mile",b:"BRXSC2 - SC",r:"SUL",g:"APROVADO"},
+  {a:"Gabrielle",n:"JERSON GOMES RODRIGUES",c:"32775131816",v:"HR",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",g:"APROVADO"},
+  {a:"Gabrielle",n:"WAGNER ALVES LEITE",c:"91252644353",v:"MÉDIO",m:"First Mile",b:"BRXGO1 - Goiânia",r:"CO",g:"APROVADO"},
+  {a:"Carlos",n:"THIAGO HENRIQUE DA SILVA SOARES",c:"39479515822",v:"UTILITÁRIO",m:"Last Mile",b:"SSP4 - Ribeirão Preto",r:"SPIO",g:"APROVADO"},
+  {a:"Gabrielle",n:"ILMARIO LELIS MOREIRA SOUSA",c:"40900646861",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinny",n:"LUIZ GERALDO FERNANDES FILHO",c:"07131263613",v:"MÉDIO",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:""},
+  {a:"Lucas",n:"EVERALDO MARCOS CARMO",c:"91239273134",v:"VUC",m:"First Mile",b:"BRXGO1 - Goiânia",r:"CO",g:"APROVADO"},
+  {a:"Lucas",n:"MATHEUS HENRIQUE APARECIDO QUEIROZ DA SILVA",c:"2638270948",v:"UTILITÁRIO",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",g:"APROVADO"},
+  {a:"Vinny",n:"LUIZ TIMOTEO DE ARAUJO",c:"22912320453",v:"VAN",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Vinny",n:"RAMON LUCIO BRANDAO",c:"09396798681",v:"HR",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"JHAMES HENRIQUE SILVA DE JESUS CARVALHO",c:"47099044800",v:"UTILITÁRIO",m:"Last Mile",b:"SSP34 - Cotia",r:"SP2",g:"APROVADO"},
+  {a:"Vinny",n:"ROGERIO MEDEIROS DE SOUSA",c:"24620260886",v:"HR",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Lucas",n:"THIAGO DIAS FERREIRA",c:"14369828716",v:"UTILITÁRIO",m:"Last Mile",b:"SRJ1 - Cordovil",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"CARLOS EDUARDO DA GAMA",c:"36960914809",v:"UTILITÁRIO",m:"Last Mile",b:"SSP4 - Ribeirão Preto",r:"SPIO",g:"APROVADO"},
+  {a:"Lucas",n:"KARINA DA SILVA DOS SANTOS",c:"13261338709",v:"VUC",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"THIAGO DE SOUZA ROCHA",c:"18470405780",v:"VUC",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Vinny",n:"KAYKY ROCHA NASCIMENTO CIPRIANO",c:"12568390603",v:"MÉDIO",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"LEONARDO PEREIRA MARCONDES PORTO",c:"15711017721",v:"HR",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"JOHN DA CRUZ LIMA",c:"90679296549",v:"MÉDIO",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Italo",n:"RICHARD SILVEIRA DINIZ",c:"14507167680",v:"UTILITÁRIO",m:"Last Mile",b:"SMG1 - Contagem",r:"MG",g:"REPROVADO"},
+  {a:"Gabrielle",n:"FABIANO MARTINS",c:"27879112855",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"LUCILAINE OLIVEIRA SILVA",c:"39773525805",v:"UTILITÁRIO",m:"Last Mile",b:"SSP9 - Limeira",r:"SP1",g:"APROVADO"},
+  {a:"Gabrielle",n:"ELIZEU CARLOS PADILHA",c:"17518231808",v:"VUC",m:"First Mile",b:"BRXSP2 - CPS",r:"SPIO",g:"APROVADO"},
+  {a:"Italo",n:"DANIEL ROSA DA SILVA",c:"15880294684",v:"UTILITÁRIO",m:"Last Mile",b:"SMG8 - Vespasiano",r:"MG",g:"APROVADO"},
+  {a:"Gabrielle",n:"WILLIAN PEREIRA DA SILVEIRA",c:"86816853687",v:"VAN",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Gabrielle",n:"RAFAEL VIEIRA DOS SANTOS",c:"10367784602",v:"MÉDIO",m:"First Mile",b:"BRXMG3 - Pouso Alegre",r:"MG",g:"APROVADO"},
+  {a:"Gabrielle",n:"GUILHERME ROCHA AGUIAR",c:"45056704814",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Italo",n:"FABIANO MENDES ACHTERBERG",c:"82183643072",v:"VAN",m:"First Mile",b:"BRXRS1 - RS",r:"SUL",g:""},
+  {a:"Gabrielle",n:"LUIZ FELIPE RODRIGUES DOS SANTOS",c:"52745062832",v:"VUC",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"PEDRO HENRIQUE DE ALMEIDA MENDES",c:"53420009801",v:"UTILITÁRIO",m:"Last Mile",b:"SSP8 - SJC",r:"SP2",g:"APROVADO"},
+  {a:"Gabrielle",n:"FILIPE FAUSTINO DOS SANTOS",c:"35764674832",v:"VUC",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",g:"APROVADO"},
+  {a:"Gabrielle",n:"ROBSON GONCALVES DOS SANTOS",c:"31331765870",v:"VUC",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"JOAO PAULO JARIN PENA",c:"06477489597",v:"VAN",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",g:"APROVADO"},
+  {a:"Gabrielle",n:"DANIEL FERREIRA",c:"04525328924",v:"MÉDIO",m:"First Mile",b:"BRXPR4 - Maringá",r:"SUL",g:"APROVADO"},
+  {a:"Vinicius",n:"RENAN BENTO DA SILVA",c:"03354994576",v:"UTILITÁRIO",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",g:"APROVADO"},
+  {a:"Carlos",n:"CARLOS ELISIO OCTAVIANI DE CASTRO",c:"64591646653",v:"HR",m:"Last Mile",b:"SMG8 - Vespasiano",r:"MG",g:"APROVADO"},
+  {a:"Vinicius",n:"DIEGO HENRIQUE LEITE",c:"42306046883",v:"UTILITÁRIO",m:"Last Mile",b:"SSP31 - Barretos",r:"SPIO",g:"APROVADO"},
+  {a:"Carlos",n:"LEONARDO SILVA DO NASCIMENTO",c:"52442222876",v:"UTILITÁRIO",m:"Last Mile",b:"SSP30 - GRU",r:"SP2",g:"APROVADO"},
+  {a:"Carlos",n:"FELIPE FREITAS DOS SANTOS",c:"02896548580",v:"VUC",m:"Last Mile",b:"SBA1 - Salvador",r:"NONECO",g:"APROVADO"},
+  {a:"Lucas",n:"WILLIAM RAMOS DA COSTA",c:"27258765832",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"JOSE LUIZ PINHEIRO DA SILVA",c:"13499482843",v:"VAN",m:"Last Mile",b:"SSP15 - Santos",r:"SP1",g:"APROVADO"},
+  {a:"Carlos",n:"GUILHERME ANTONIO ELIAS PETINELI",c:"39892406842",v:"UTILITÁRIO",m:"Last Mile",b:"SSP4 - Ribeirão Preto",r:"SPIO",g:"APROVADO"},
+  {a:"Vinicius",n:"LEONILSON PEREIRA DOS SANTOS",c:"46472304904",v:"UTILITÁRIO",m:"Last Mile",b:"SPR7 - Ponta Grossa",r:"SUL",g:"APROVADO"},
+  {a:"Carlos",n:"OSNI DE ARAUJO TEIXEIRA",c:"45832838904",v:"UTILITÁRIO",m:"Last Mile",b:"SPR2 - Londrina",r:"SUL",g:"APROVADO"},
+  {a:"Lucas",n:"CAIO QUIRINO",c:"48006710864",v:"TRUCK",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"JOSE HENRIQUE SOARES SOARES",c:"05372345276",v:"HR",m:"Last Mile",b:"SPA1 - Belém",r:"NONECO",g:"APROVADO"},
+  {a:"Lucas",n:"VINICIUS NASCIMENTO DE OLIVEIRA",c:"49778985839",v:"UTILITÁRIO",m:"Last Mile",b:"SSP30 - GRU",r:"SP2",g:"APROVADO"},
+  {a:"Vinicius",n:"LEANDRO ROCHA ALVES",c:"10799438626",v:"UTILITÁRIO",m:"Last Mile",b:"SMG1 - Contagem",r:"MG",g:"APROVADO"},
+  {a:"Vinicius",n:"UENDER JULIO DE MENDONCA",c:"03135376664",v:"UTILITÁRIO",m:"Last Mile",b:"SMG6 - Uberlândia",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"ALINE JAMILE DA SILVA E SILVA VIANA",c:"14534443781",v:"VUC",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Vinicius",n:"ALLAN GOMES BONFIM",c:"39884962863",v:"UTILITÁRIO",m:"Last Mile",b:"SSP23 - Mogi das Cruzes",r:"SP2",g:"APROVADO"},
+  {a:"Lucas",n:"WAGNER XAVIER DOS SANTOS JUNIOR",c:"16229255723",v:"VUC",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"DANIEL ROSARIO VELOSO",c:"14172059708",v:"VUC",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"YURI DE ALMEIDA CRUZ",c:"14969957754",v:"MÉDIO",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Gabrielle",n:"CELSO APARECIDO DE GRANDE",c:"66598811000",v:"VAN",m:"Fulfillment",b:"Full SSP22 - São Carlos",r:"SPIO",g:""},
+  {a:"Lucas",n:"EDILMAR DOS SANTOS RHEIN DE OLIVEIRA",c:"92633170030",v:"MÉDIO",m:"First Mile",b:"BRXRS1 - RS",r:"SUL",g:"APROVADO"},
+  {a:"Lucas",n:"PABLO LOURENÇO SILVA",c:"45335452897",v:"MÉDIO",m:"First Mile",b:"BRXSP5 - RAO",r:"SPIO",g:"APROVADO"},
+  {a:"Italo",n:"RAFAEL GONCALVES PINHEIRO",c:"40143074172",v:"UTILITÁRIO",m:"Last Mile",b:"SGO3 - Hidrolândia",r:"NONECO",g:"APROVADO"},
+  {a:"Carlos",n:"ENOQUE DA SILVA ANDRADE",c:"25607594890",v:"UTILITÁRIO",m:"Last Mile",b:"SSP23 - Mogi das Cruzes",r:"SP2",g:"APROVADO"},
+  {a:"Vinny",n:"LUCAS ALMEIDA DA SILVA",c:"39825177888",v:"VUC",m:"First Mile",b:"ZN - Zona Norte",r:"SPC",g:"APROVADO"},
+  {a:"Lucas",n:"EDUARDO MARTINS DOS SANTOS JUNIOR",c:"40238568865",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Gabrielle",n:"JEFFERSON FERREIRA SANTOS",c:"41306400899",v:"HR",m:"",b:"",r:"",g:"REPROVADO"},
+  {a:"Vinny",n:"VICTOR CAETANO MACIEL",c:"12983677788",v:"UTILITÁRIO",m:"Last Mile",b:"SES1 - Vitória",r:"RIES",g:"APROVADO"},
+  {a:"Lucas",n:"VICTOR MOURA SILVA",c:"39810061862",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Gabrielle",n:"CRISTIANO DE OLIVEIRA ALMEIDA",c:"17585676867",v:"VAN",m:"First Mile",b:"ZN - Zona Norte",r:"SPC",g:"APROVADO"},
+  {a:"Gabrielle",n:"HENRIQUE SILVA GONCALVES",c:"33368315803",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Italo",n:"RAFAEL SCHULTZ",c:"07650894673",v:"UTILITÁRIO",m:"Last Mile",b:"SMG5 - Poços de Caldas",r:"MG",g:"APROVADO"},
+  {a:"Vinny",n:"JOHNNY HARRISON DINIZ URSO",c:"35844700805",v:"VUC",m:"Fulfillment",b:"BRRC01 - Perus",r:"SPC",g:"APROVADO"},
+  {a:"Vinny",n:"JOAO MARCOS ALVES",c:"12862284688",v:"TOCO",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"CAUE CASARINO VIEIRA",c:"47592024802",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:""},
+  {a:"Vinny",n:"ANDRE HENRIQUE OLIVEIRA MENDONCA",c:"39640658898",v:"VAN",m:"First Mile",b:"BRXSP5 - RAO",r:"SPIO",g:"APROVADO"},
+  {a:"Lucas",n:"CLECIO LUAN SANTOS COSTA",c:"39505794860",v:"VUC",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinny",n:"RAIMUNDO NONATO FARIAS CRUZ",c:"05228705708",v:"VUC",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Lucas",n:"EVERTON DAMIAO MORO",c:"30975676822",v:"VAN",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinny",n:"GENESIO EDER RODRIGUES",c:"42240263687",v:"MÉDIO",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"RENAN DOS SANTOS UZUM",c:"45014636861",v:"UTILITÁRIO",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",g:"APROVADO"},
+  {a:"Vinicius",n:"LEIDIOMAR LUIS RODRIGUES",c:"26583667878",v:"HR",m:"Last Mile",b:"SSP5 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Larissa",n:"THIAGO GABRIEL GONCALVES",c:"48996609870",v:"UTILITÁRIO",m:"Last Mile",b:"SSP8 - SJC",r:"SP2",g:"APROVADO"},
+  {a:"Lucas",n:"DANILO PARDINI DA SILVA",c:"44323560818",v:"UTILITÁRIO",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",g:"APROVADO"},
+  {a:"Vinny",n:"FABIANO COGLIONE DINIZ",c:"95953485034",v:"VAN",m:"First Mile",b:"BRXRS1 - RS",r:"SUL",g:"APROVADO"},
+  {a:"Vinny",n:"GUSTAVO HENRIQUE DE SOUZA",c:"70148842631",v:"VAN",m:"First Mile",b:"BRXMG1 - MG",r:"MG",g:"APROVADO"},
+  {a:"Lucas",n:"MARCELO PICH LOURENÇO",c:"00133793052",v:"CARRETA",m:"",b:"",r:"",g:"APROVADO"},
+  {a:"Vinny",n:"WILLIAM ALVES DE MOURA",c:"32047308836",v:"VAN",m:"Fulfillment",b:"BRRC01 - Perus",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"WELLINGTON LUIZ RODRIGUES",c:"06629056361",v:"UTILITÁRIO",m:"Last Mile",b:"SSP9 - Limeira",r:"SP1",g:"APROVADO"},
+  {a:"Vinicius",n:"DAVI DA SILVA VIEIRA",c:"16489100762",v:"UTILITÁRIO",m:"Last Mile",b:"SSP8 - SJC",r:"SP2",g:"APROVADO"},
+  {a:"Carlos",n:"GABRIEL JUNIO DE AQUINO SILVA",c:"13754144618",v:"UTILITÁRIO",m:"Last Mile",b:"SMG1 - Contagem",r:"MG",g:"APROVADO"},
+  {a:"Vinicius",n:"MATHEUS BULSONI DE ANDRADE",c:"47629636822",v:"UTILITÁRIO",m:"Last Mile",b:"SSP9 - Limeira",r:"SP1",g:"APROVADO"},
+  {a:"Carlos",n:"TATIANA APARECIDA DE OLIVEIRA",c:"31690008881",v:"UTILITÁRIO",m:"Last Mile",b:"SSP38 - Itupeva",r:"SP1",g:"APROVADO"},
+  {a:"Italo",n:"BRENDON SOARES DE MELLO GRAMA",c:"15706246742",v:"HR",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",g:"APROVADO"},
+  {a:"Carlos",n:"MAYCON ALEXANDRE VIGNANDO",c:"04916162951",v:"UTILITÁRIO",m:"Last Mile",b:"SGO1 - Goiânia",r:"NONECO",g:"APROVADO"},
+  {a:"Vinicius",n:"CRISTIANO FERREIRA DOS SANTOS",c:"07434181664",v:"UTILITÁRIO",m:"Last Mile",b:"SMG10 - Divinópolis",r:"MG",g:"APROVADO"},
+  {a:"Vinicius",n:"THAMIRIS DA SILVA DANTAS",c:"02535328500",v:"HR",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",g:"APROVADO"},
+  {a:"Vinicius",n:"GILBERTO JOSE SOARES",c:"27544494500",v:"UTILITÁRIO",m:"Last Mile",b:"SBA6 - Salvador",r:"NONECO",g:"APROVADO"},
+  {a:"Vinicius",n:"FLAVIO PEREIRA DE ARAUJO",c:"31860234836",v:"UTILITÁRIO",m:"Last Mile",b:"SSP5 - ARE",r:"SP2",g:"APROVADO"},
+  {a:"Carlos",n:"WANDER BRUNO SANTOS OLIVEIRA",c:"62109456353",v:"UTILITÁRIO",m:"Last Mile",b:"SCE1 - Fortaleza",r:"NONECO",g:"APROVADO"},
+  {a:"Carlos",n:"WELLINGTON DE NOVAES ROSA",c:"41939546842",v:"VUC",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Vinicius",n:"MATHEUS JESUS BARBOSA ZORANTE",c:"41253244847",v:"UTILITÁRIO",m:"Last Mile",b:"SSP17 - SBC",r:"SP1",g:"APROVADO"},
+  {a:"Lucas",n:"ELIAS FERREIRA DO PRADO",c:"28151843896",v:"MÉDIO",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Lucas",n:"LEONARDO DIAS DE SOUSA",c:"52070035859",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Lucas",n:"MATHEUS DA SILVA FERREIRA",c:"50604878818",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+  {a:"Lucas",n:"MARCOS ANTONIO DOS SANTOS",c:"06311618486",v:"UTILITÁRIO",m:"Last Mile",b:"SPE1 - Recife",r:"NONECO",g:"APROVADO"},
+  {a:"Lucas",n:"ARLETON FERNANDO SANTOS DA SILVA",c:"13657709401",v:"UTILITÁRIO",m:"Last Mile",b:"SPE1 - Recife",r:"NONECO",g:"APROVADO"},
+  {a:"Lucas",n:"RODRIGO CLEMENTIINO DE OLIVEIRA",c:"09017700432",v:"UTILITÁRIO",m:"Last Mile",b:"SRN1 - Natal",r:"NONECO",g:"APROVADO"},
+  {a:"Lucas",n:"FERNANDO DA SILVA LASZLO",c:"22043124870",v:"UTILITÁRIO",m:"Last Mile",b:"SSP48 - Jaguaré",r:"SP2",g:"APROVADO"},
+  {a:"Lucas",n:"ANDERSON RUFINO BRAGA DE ANDRADE",c:"42383634859",v:"VAN",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",g:"APROVADO"},
+  {a:"Lucas",n:"GUSTAVO HENRIQUE DOS SANTOS SIMAO",c:"50464014875",v:"HR",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",g:"APROVADO"},
+];
+
+const guep=[
+  {r:"Claudio",n:"EDMILSON GREGORIO",c:"28862579829",p:"EYM7A44",f:"",s:"APROVADO"},
+  {r:"Claudio",n:"Gabriel Machado de Siqueira",c:"48353737825",p:"FVP8G30",f:"",s:"APROVADO"},
+  {r:"Italo",n:"Leonio Ananias Alves da Nobrega",c:"68824270115",p:"PBG4C64",f:"",s:"LICENCIAMENTO"},
+  {r:"Lucas Matos",n:"Everaldo Marcos Carmo",c:"91239273134",p:"",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"ELIZEU CARLOS PADILHA",c:"17518231808",p:"FOW9H69",f:"",s:"APROVADO"},
+  {r:"Mariana",n:"ERICSON INACIO RUGISKI",c:"00700369937",p:"AYG0E78",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"WILLIAN PEREIRA DA SILVEIRA",c:"86816853687",p:"RTU7J95",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"MARCELO PICH LOURENÇO",c:"00133793052",p:"IPW3B09",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Pablo Lourenço Silva",c:"45335452897",p:"FLN0F43",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"EDUARDO MARTINS DOS SANTOS JUNIOR",c:"40238568865",p:"DJL7B85",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"FELIPE DE SOUZA SANTOS",c:"47459673811",p:"ELQ6D00",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"DERLEIS BRAGA FERREIRA",c:"30086587846",p:"DTC0E33",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"VICTOR MOURA SILVA",c:"39810061862",p:"FWX4B36",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"CAUE CASARINO VIEIRA",c:"47592024802",p:"FAE8B42",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"CLECIO LUAN SANTOS COSTA",c:"39505794860",p:"EPW1272",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"EVERTON DAMIAO MORO",c:"30975676822",p:"OGC7C99",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Hozana Sabino Monteiro",c:"05853564757",p:"DWG8H37",f:"",s:"FALTA DOC"},
+  {r:"Lucas Matos",n:"RENAN DOS SANTOS UZUM",c:"45014636861",p:"BDU2G05",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"DANILO PARDINI DA SILVA",c:"44323560818",p:"OOJ4568",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"RAFAEL VIEIRA DOS SANTOS",c:"10367784602",p:"OLV0F01",f:"",s:"APROVADO"},
+  {r:"Mariana",n:"JONAS PEREIRA DA ROCHA",c:"50350162859",p:"FHL5I32",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"ALLAN GOMES BONFIM",c:"39884962863",p:"FSI0C70",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"LUCAS DOS SANTOS MOREIRA",c:"42632569800",p:"EEY7942",f:"",s:"REPROVADO"},
+  {r:"Vinny",n:"ROGERIO MEDEIROS DE SOUSA",c:"24620260886",p:"DUM2544",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"WILSON PEREIRA VALLIM",c:"07576202645",p:"GZB2950",f:"",s:"LICENCIAMENTO"},
+  {r:"Vitor Dias",n:"adilson matos de pinho",c:"287921140",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinny",n:"KAYKY ROCHA NASCIMENTO CIPRIANO",c:"12568390603",p:"AUG4D30",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"ELIAS MELO RAMOS",c:"04680031263",p:"QWS0A36",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"LUCAS ALMEIDA DA SILVA",c:"39825177888",p:"FCB1540",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"UENDER JULIO DE MENDONCA",c:"03135376664",p:"QOU9C13",f:"",s:"APROVADO"},
+  {r:"Gabriel",n:"MATHEUS FELIPE MOTA PIRES",c:"08779892574",p:"JVH0D38",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"edivan cardozo dias",c:"97012041153",p:"FVZ7A81",f:"",s:"LICENCIAMENTO"},
+  {r:"Vinicius",n:"LEANDRO ROCHA ALVES",c:"10799438626",p:"RFR7C74",f:"",s:"APROVADO"},
+  {r:"Larissa",n:"DANIEL PAULINO GOMES BARBOSA",c:"09441136646",p:"SIB1J91",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"MATHEUS JESUS BARBOSA ZORANTE",c:"41253244847",p:"RNQ3B97",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"WARLEY FERNANDES GONZAGA",c:"05034625512",p:"NYS0898",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"DAVID BORGES DA SILVA",c:"28437887810",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinicius",n:"JOAO PAULO JARIN PENA",c:"06477489597",p:"PVB7B25",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"LUCILAINE OLIVEIRA SILVA",c:"39773525805",p:"FSU9F79",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"FELIPE TADEU DE CAMARGO",c:"40519308824",p:"",f:"S",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"CARLOS ELISIO OCTAVIANI DE CASTRO",c:"64591646653",p:"HIC5029",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"JOILSON FERNANDES CORREA",c:"28907878854",p:"SID8B19",f:"",s:"REPROVADO"},
+  {r:"Vinicius",n:"MATHEUS ALVES DOS SANTOS",c:"22990853863",p:"UFR0H11",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"GILBERTO JOSE SOARES",c:"27544494500",p:"RCX0E73",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"VICTOR CAETANO MACIEL",c:"12983677788",p:"QPW7I67",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"MARCELO CARDOSO SILVA",c:"05924850641",p:"OSQ6320",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"JOSE HENRIQUE SOARES SOARES",c:"05372345276",p:"OWW2I12",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"JOSE LUIZ PINHEIRO DA SILVA",c:"13499482843",p:"SDS4B55",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"JOSE CLAUDIO DOS SANTOS SILVA",c:"41210203839",p:"",f:"ETC",s:"LICENCIAMENTO"},
+  {r:"Gabrielle",n:"GUILHERME ROCHA AGUIAR",c:"45056704814",p:"KMD3D83",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"RENAN BENTO DA SILVA",c:"03354994576",p:"QXB8D05",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"LEONARDO SILVA DO NASCIMENTO",c:"52442222876",p:"RTS2D99",f:"",s:"APROVADO"},
+  {r:"Italo",n:"Fabiano Mendes Achterberg",c:"",p:"IWW7H36",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"KAUANE CAROLINE DOS SANTOS",c:"47497862847",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinny",n:"JOHNNY HARRISON DINIZ URSO",c:"35844700805",p:"EYB1B72",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"DIEGO HENRIQUE LEITE",c:"42306046883",p:"QOK7D98",f:"",s:"APROVADO"},
+  {r:"Joyce",n:"RHULIT RENAN VALVERDE ALVES",c:"42894126883",p:"",f:"S",s:"APROVADO"},
+  {r:"Gabrielle",n:"LUIZ FELIPE RODRIGUES DOS SANTOS",c:"52745062832",p:"JAS0C78",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"FILIPE FAUSTINO DOS SANTOS",c:"35764674832",p:"EVX8H35",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"PEDRO HENRIQUE DE ALMEIDA MENDES",c:"53420009801",p:"GCY5E60",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"JOAO MARCOS ALVES",c:"12862284688",p:"KXS5H19",f:"",s:"APROVADO"},
+  {r:"Italo",n:"RICHARD SILVEIRA DINIZ",c:"14507167680",p:"GQR6I78",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"GABRIEL CRUZ",c:"48189058878",p:"",f:"S",s:"APROVADO"},
+  {r:"Gabrielle",n:"ROBSON GONCALVES DOS SANTOS",c:"31331765870",p:"ETU2F35",f:"",s:"APROVADO"},
+  {r:"Mariana",n:"RAIQUI APARECIDO FELIX SOUSA",c:"48680259888",p:"FCS3A98",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"DANIEL FERREIRA",c:"04525328924",p:"EPU5D56",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"EDNILSON PAULA SILVA",c:"46580446846",p:"",f:"S",s:"APROVADO"},
+  {r:"Italo",n:"DANIEL ROSA DA SILVA",c:"15880294684",p:"RGA9H07",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"FELIPE FREITAS DOS SANTOS",c:"02896548580",p:"RCP7F73",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"GUILHERME ANTONIO ELIAS PETINELI",c:"39892406842",p:"FXT1F37",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"ANDRE HENRIQUE OLIVEIRA MENDONCA",c:"39640658898",p:"FYS4D45",f:"",s:"APROVADO"},
+  {r:"Italo",n:"Matheus Souza da Silva",c:"05791514174",p:"JJU1F81",f:"",s:"REPROVADO"},
+  {r:"Vinny",n:"RAIMUNDO NONATO FARIAS CRUZ",c:"05228705708",p:"FLO7H70",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"GUSTAVO HENRIQUE DE SOUZA",c:"70148842631",p:"NBI1D77",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"OSNI DE ARAUJO TEIXEIRA",c:"45832838904",p:"OWP1E74",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"GENESIO EDER RODRIGUES",c:"42240263687",p:"NTM8528",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"CRISTIANO DE OLIVEIRA ALMEIDA",c:"17585676867",p:"DTE6B49",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"HENRIQUE SILVA GONCALVES",c:"33368315803",p:"CPJ7A61",f:"",s:"APROVADO"},
+  {r:"TUANE",n:"Willem Fiedler",c:"36325976851",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Rafael Fernando das Merces",c:"39403194812",p:"NPJ1A66",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"ELIAS FERREIRA DO PRADO",c:"28151843896",p:"BHR8G84",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Livaldo dos Santos Nascimento",c:"05483480570",p:"GES2B73",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Leonardo Dias de Sousa",c:"52070035859",p:"NHG2G22",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Matheus da Silva Ferreira",c:"50604878818",p:"ELP6F75",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Marcos Antonio dos Santos",c:"06311618486",p:"KIO9J65",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Arleton Fernando Santos da Silva",c:"13657709401",p:"RGB5C93",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Rodrigo Clementiino de Oliveira",c:"09017700432",p:"OWB7F47",f:"ETC",s:"APROVADO"},
+  {r:"Lucas Matos",n:"DOUGLAS DOS SANTOS DA SILVA",c:"16729513721",p:"LMZ7A86",f:"ETC",s:"APROVADO"},
+  {r:"Gabrielle",n:"RICHARLES GONCALVES DE SOUZA",c:"33112075803",p:"ESU0079",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"LEIDIOMAR LUIS RODRIGUES",c:"26583667878",p:"BUD4I94",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"DAVI ISRAEL DA CRUZ",c:"26807933827",p:"CVN5J23",f:"",s:"APROVADO"},
+  {r:"Italo",n:"Rafael Goncalves Pinheiro",c:"40143074172",p:"AZE8H36",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"FLAVIO PEREIRA DE ARAUJO",c:"31860234836",p:"SHE9I50",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"FABIANO COGLIONE DINIZ",c:"95953485034",p:"ITJ6B98",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"DOUGLAS GABRIEL NUNES SILVA",c:"70360612601",p:"OQB5H94",f:"",s:"LICENCIAMENTO"},
+  {r:"Italo",n:"RAFAEL SCHULTZ",c:"07650894673",p:"HNO6G00",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"ENOQUE DA SILVA ANDRADE",c:"25607594890",p:"FSQ4G52",f:"",s:"APROVADO"},
+  {r:"TUANE",n:"Angélica Patrício Alves Da Silva",c:"37125261809",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Janderson Ferreira Peres",c:"01656934019",p:"",f:"S/Novolante",s:"REPROVADO"},
+  {r:"TUANE",n:"André Luiz Honório",c:"34700831855",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Cláudio Ferreira Justino",c:"",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"João Vitor Ferreira De Souza",c:"49331202857",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Thiago Henrique dos Santos",c:"37879462848",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Luís Otávio Barufaldi Mafra",c:"50589358804",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Maurício Borges Ferreira",c:"39095160920",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Daniel Cristiano Castro Da Cunha",c:"32634720890",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Diego Guimarães Siqueira",c:"06122265144",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Antônio Magalhães Domingos Dos Santos",c:"04062716151",p:"",f:"S/Novolante",s:"REPROVADO"},
+  {r:"TUANE",n:"Richard Natan Salgado Henrique Pereira",c:"04127454024",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Andrea Judite Morales",c:"93498241087",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Diego Oliveira Silva",c:"52997891817",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"TUANE",n:"Bruno Markinelande Da Silva",c:"23752781866",p:"",f:"S/Novolante",s:"APROVADO"},
+  {r:"Vitor Dias",n:"DIEGO TIAGO DOS SANTOS",c:"39916019827",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinny",n:"WILLIAM ALVES DE MOURA",c:"32047308836",p:"UFR4A61",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"Denilson Macedo Silva",c:"52600683860",p:"",f:"s",s:"APROVADO"},
+  {r:"Gabrielle",n:"ALEXANDRE MENEZES MATOS",c:"41422802876",p:"ETP6I30",f:"",s:"APROVADO"},
+  {r:"Joyce",n:"FRANCISCO FEITOZA CARDOSO",c:"02215358378",p:"",f:"S",s:"REPROVADO"},
+  {r:"Gabrielle",n:"ISRAEL RIBEIRO DE PAIVA",c:"41611765897",p:"NPV5C43",f:"ENVIOS OK",s:"APROVADO"},
+  {r:"Gabrielle",n:"JEFFERSON FERREIRA SANTOS",c:"41306400899",p:"AXC2J81",f:"",s:"REPROVADO"},
+  {r:"Gabrielle",n:"JEFFERSON BRUNO DA ROCHA CARVALHO",c:"36506203838",p:"FLF1G94",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"ALEX SOUZA DAMASCENO",c:"30300356897",p:"FRE0D73",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"FABRICIO ANTONIO DE SOUZA DELGADO",c:"04983039694",p:"NXX0I55",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"ALYSSON FABRICIO DE CASTRO PEREIRA",c:"08898356676",p:"NZN4D09",f:"",s:"APROVADO"},
+  {r:"Larissa",n:"THIAGO GABRIEL GONCALVES",c:"48996609870",p:"RFH9J85",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"ISAQUE FERREIRA DE BRITO",c:"40856707864",p:"NME8D18",f:"",s:"REPROVADO"},
+  {r:"Vinicius",n:"THIAGO DA SILVA MACHADO",c:"38161859833",p:"PXA8I56",f:"",s:"REPROVADO"},
+  {r:"Carlos Queiroz",n:"TATIANA APARECIDA DE OLIVEIRA",c:"31690008881",p:"SCB4D07",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"VIVIANE DE ALMEIDA SANTOS",c:"29395322810",p:"EUH6D90",f:"",s:"APROVADO"},
+  {r:"Mariana",n:"DANIEL BRITO DOS SANTOS",c:"40099174820",p:"UFW6F68",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"GABRIEL JUNIO DE AQUINO SILVA",c:"13754144618",p:"FMG0F58",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"THAMIRIS DA SILVA DANTAS",c:"02535328500",p:"OKO2G33",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"FERNANDO BORGES SANTOS",c:"38001991814",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinny",n:"EDMILSON VIEIRA DE BARROS",c:"37247069449",p:"ELQ1E49",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"CRISTIANO FERREIRA DOS SANTOS",c:"07434181664",p:"PYY6I51",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"LUIZ FERNANDO DOS SANTOS SALES",c:"36009847800",p:"FYW7E75",f:"",s:"APROVADO"},
+  {r:"Vinicius",n:"WELLINGTON LUIZ RODRIGUES",c:"06629056361",p:"GIS1I96",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"RONALDO DE JESUS DUTRA",c:"01645891399",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinicius",n:"DAVI DA SILVA VIEIRA",c:"16489100762",p:"LRK9G67",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"RICARDO SABINO",c:"29265783850",p:"FFQ9H66",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"FRANCISCO MOTA NETO",c:"84568364353",p:"",f:"S",s:"APROVADO"},
+  {r:"Vinicius",n:"MATHEUS BULSONI DE ANDRADE",c:"47629636822",p:"EJK0H86",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"VICTOR HUGO HATORI DA SILVA",c:"43483272895",p:"",f:"S",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"MAYCON ALEXANDRE VIGNANDO",c:"04916162951",p:"JJH8I49",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"GUILHERME AGUIAR SOUSA",c:"45964819893",p:"EGM4D74",f:"",s:"APROVADO"},
+  {r:"Thiago",n:"EDNALDO JACINTO ARAUJO DA SILVA",c:"41382478828",p:"",f:"S",s:"APROVADO"},
+  {r:"Thiago",n:"HUGO TORRES DOS SANTOS",c:"11311751408",p:"",f:"S",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"WANDER BRUNO SANTOS OLIVEIRA",c:"62109456353",p:"RMP4H45",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"DEUSDENIS DOS SANTOS SILVA",c:"41836835050",p:"GFB0A21",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"EDMILSON CORREIA FERREIRA",c:"03860508482",p:"NET4C85",f:"",s:"REPROVADO"},
+  {r:"Carlos Queiroz",n:"WELLINGTON DE NOVAES ROSA",c:"41939546842",p:"ETK3G65",f:"",s:"APROVADO"},
+  {r:"Carlos Queiroz",n:"RAYANE BARBOSA DE OLIVEIRA",c:"05521657193",p:"JIX1D91",f:"",s:"APROVADO"},
+  {r:"Vitor Dias",n:"ERDESON RIBEIRO DE OLIVEIRA",c:"45308249857",p:"",f:"S",s:"APROVADO"},
+  {r:"Claudio",n:"RUDNEI LUIZ DA SILVA",c:"34413786874",p:"EQB3E69",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Gabriel Fernandes da Silva",c:"01659991447",p:"RFL5I05",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"LEANDRO SILVA DA PAZ",c:"41201662877",p:"EVI4D71",f:"",s:"REPROVADO"},
+  {r:"Lucas Matos",n:"JOYCE SANTOS DE CASTRO EDUARDO",c:"44769010850",p:"NWA8303",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"LUCAS HENRIQUE BRAGA DOS SANTOS",c:"42910083845",p:"FOF1B95",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"ELAN FRANCISCO ASCANIO DOS SANTOS",c:"42828292819",p:"Otf0i35",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Maicon Adriano Rodrigues Miagima",c:"35229421835",p:"FEJ0B86",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"BRUNO RUESCA SOARES",c:"50193811871",p:"HBZ9C33",f:"",s:"PENDENTE ENVIO p/ GUEP"},
+  {r:"Lucas Matos",n:"ALESSANDRO JOSE BARBOZA GUSMÃO",c:"28575593803",p:"FZR0I24",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"FLAVIO JOSE DE SOUZA",c:"21654116882",p:"UFP0F28",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"YAGO GALLAN BATISTA OLIVEIRA",c:"16803084752",p:"KPX3I29",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Domingos Ferreira Souza",c:"64678890530",p:"SWG8D13",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"ELIAS FERREIRA DO PRADO 2",c:"28151843896",p:"BHR8G84",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"JOSE ROBERTO RODRIGUES GARCIA",c:"28731818854",p:"RJU1I39",f:"",s:"APROVADO"},
+  {r:"Lucas Matos",n:"Bruno Gustavo da Silva",c:"08256684682",p:"FQY3B32",f:"",s:"FALTA DOC"},
+  {r:"Vinny",n:"DIOGENES MENEZES DOS SANTOS",c:"37315991808",p:"EWJ1299",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"DOUGLAS BUENO GONCALVES",c:"09946323982",p:"QJO6A51",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"VITOR LUIZ LORENA LAGOS",c:"55699861890",p:"TLP3H61",f:"",s:"APROVADO"},
+  {r:"Gabrielle",n:"JOSE LEANDRO MARTINS QUARTI",c:"58627758034",p:"IYY8J36",f:"",s:"REPROVADO"},
+  {r:"Gabrielle",n:"VANILDO DOS SANTOS GENARO",c:"19733419800",p:"AXB7J88",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"PETERSON CABRAL OLIVEIRA",c:"03523174694",p:"FLF4J34",f:"",s:"APROVADO"},
+  {r:"Vinny",n:"LAURA VENTURA ALVES",c:"70146192680",p:"PTH9E38",f:"",s:"APROVADO"},
+];
+
+const cont=[
+  {a:"Thiago",id:"FF_17131",n:"SAMUEL ALVES DA SILVA",cpf:"65753047",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SMN1 - São Luís",r:"NONECO",e:"",p:"Frota Fixa"},
+  {a:"Claudio",id:"37008",n:"GUSTAVO DE SOUZA SAIAGO GUERRA",cpf:"03813830080",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSC2 - SC",r:"SUL",e:"",p:"P2"},
+  {a:"Larissa",id:"33047",n:"ANDREIA ATADEU DA SILVA",cpf:"03239011662",v:"VAN",f:"Frota Spot",m:"Last Mile",b:"SJP1 - João Pessoa",r:"NONECO",e:"",p:"P2"},
+  {a:"Mariana",id:"37563",n:"COSMO FERREIRA",cpf:"02499980419",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P0"},
+  {a:"Lucas",id:"32120",n:"DERRICK FIRMINO DA GAMA",cpf:"36668523862",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"ETC",p:"P2"},
+  {a:"Claudio",id:"29477",n:"FLAVIO TOFFOLI",cpf:"29057912848",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"ZN - Zona Norte",r:"SPC",e:"",p:"P2"},
+  {a:"Larissa",id:"36915",n:"LUCIANA BERGO DE FREITAS CARVALHO",cpf:"08952919670",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P2"},
+  {a:"Mariana",id:"38160",n:"ELIEZIO SILVA DE CASTRO",cpf:"03740907347",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P2"},
+  {a:"Vinny",id:"37548",n:"LUIZ GERALDO FERNANDES FILHO",cpf:"07131263613",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P0"},
+  {a:"Larissa",id:"39329",n:"WILLIAN MORETTO BERALDO",cpf:"06026476903",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPR6 - Maringá",r:"SUL",e:"",p:"P0"},
+  {a:"Lucas",id:"36774",n:"EVERALDO MARCOS CARMO",cpf:"91239273134",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXGO1 - Goiânia",r:"CO",e:"ETC",p:"P2"},
+  {a:"Lara",id:"FF_16803",n:"RISTER STALLE MIRANDA DOS SANTOS",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSC8 - Itajaí",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Lucas",id:"37516",n:"MATHEUS HENRIQUE APARECIDO QUEIROZ DA SILVA",cpf:"2638270948",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"33914",n:"JHAMES HENRIQUE SILVA DE JESUS CARVALHO",cpf:"47099044800",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP34 - Cotia",r:"SP2",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"39104",n:"THIAGO DIAS FERREIRA",cpf:"14369828716",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRJ1 - Cordovil",r:"RIES",e:"ETC",p:"P0"},
+  {a:"Gabriel",id:"40817",n:"MATHEUS FELIPE MOTA PIRES",v:"HR",f:"Frota Spot",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",e:"",p:"P2"},
+  {a:"Lara",id:"FF_17160",n:"ALEXANDER DA SILVA",v:"VAN",f:"Frota Fixa",m:"",b:"",r:"",e:"",p:"Frota Fixa"},
+  {a:"Larissa",id:"36657",n:"EVERTON APRIGIO DA SILVA",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP2 - CPS",r:"SPIO",e:"",p:"P2"},
+  {a:"Lucas",id:"39639",n:"CARLOS EDUARDO DA GAMA",cpf:"36960914809",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP4 - Ribeirão Preto",r:"SPIO",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"38382",n:"KARINA DA SILVA DOS SANTOS",cpf:"13261338709",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"38426",n:"THIAGO DE SOUZA ROCHA",cpf:"18470405780",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Joyce",id:"FF_17042",n:"CASSIA MURIELI ARAUJO OLIVEIRA",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SSP22 - São Carlos",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Thiago",id:"FF_16612",n:"WELLINGTON WILLIAN PEREIRA DA SILVA",v:"VUC",f:"Frota Fixa",m:"Last Mile",b:"SSP30 - GRU",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Claudio",id:"38322",n:"FABIANO MARTINS",cpf:"27879112855",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P2"},
+  {a:"Lucas",id:"38408",n:"LEONARDO PEREIRA MARCONDES PORTO",cpf:"15711017721",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"38171",n:"JOHN DA CRUZ LIMA",cpf:"90679296549",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Claudio",id:"42030",n:"DAVIDSON DOS SANTOS",cpf:"34112222807",v:"VUC",f:"Frota Spot",m:"Fulfillment",b:"BRRC01 - Perus",r:"SPC",e:"",p:"P0"},
+  {a:"Mariana",id:"35789",n:"FABIANO FERREIRA DOS SANTOS",cpf:"21507169841",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP11 - PRU",r:"SPIO",e:"",p:"P1"},
+  {a:"Vinicius",id:"40930",n:"PEDRO HENRIQUE DE ALMEIDA MENDES",cpf:"53420009801",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP8 - SJC",r:"SP2",e:"",p:"P2"},
+  {a:"Mariana",id:"37070",n:"VINICIUS CARLOS DE MELO",cpf:"38642392819",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P1"},
+  {a:"Lara",id:"FF_16842",n:"WESLLY BARBOSA DA SILVA",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSP38 - Itupeva",r:"SPIO",e:"",p:"Frota Fixa"},
+  {a:"Vinicius",id:"41270",n:"RENAN BENTO DA SILVA",cpf:"03354994576",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",e:"",p:"P2"},
+  {a:"Vitor",id:"FF_16628",n:"MURILO GABRIEL FERREIRA NUNES",v:"VUC",f:"Frota Fixa",m:"Last Mile",b:"SSP20 - Sorocaba",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Vinicius",id:"42536",n:"DIEGO HENRIQUE LEITE",cpf:"42306046883",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP31 - Barretos",r:"SPIO",e:"",p:"P2"},
+  {a:"Gabriel",id:"38611",n:"LUIZ CARLOS FERNANDES",cpf:"17641480888",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPR2 - Londrina",r:"SUL",e:"",p:"P2"},
+  {a:"Mariana",id:"35837",n:"WANDERSON DIAS SALOMAO",cpf:"45513846829",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"",p:"P2"},
+  {a:"Lucas",id:"32333",n:"WILLIAM RAMOS DA COSTA",cpf:"27258765832",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Mariana",id:"38131",n:"KLEBER PEREIRA BORGES",cpf:"16623710809",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P2"},
+  {a:"Larissa",id:"41812",n:"ANDREZA DAS GRAÇAS LIBERATO VIEIRA",cpf:"03560987610",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP3 - CPS",r:"SPIO",e:"",p:"P2"},
+  {a:"Vinicius",id:"41332",n:"LEONILSON PEREIRA DOS SANTOS",cpf:"46472304904",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPR7 - Ponta Grossa",r:"SUL",e:"",p:"P1"},
+  {a:"Lucas",id:"36907",n:"CAIO QUIRINO",cpf:"48006710864",v:"TRUCK",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Larissa",id:"33114",n:"DANIEL RODRIGUES AZALI",cpf:"13570127648",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SMG15 - Contagem",r:"MG",e:"",p:"P2"},
+  {a:"Lucas",id:"34963",n:"VINICIUS NASCIMENTO DE OLIVEIRA",cpf:"49778985839",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP30 - GRU",r:"SP2",e:"ETC",p:"P2"},
+  {a:"Lara",id:"FF_17161",n:"JORGE LUIZ DE OLIVEIRA",v:"VUC",f:"Frota Fixa",m:"",b:"",r:"",e:"",p:"Frota Fixa"},
+  {a:"Thiago",id:"FF_17133",n:"RICARDO AUGUSTO BEZERRA SILVA JUNIOR",cpf:"62350391310",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SMN1 - São Luís",r:"NONECO",e:"",p:"Frota Fixa"},
+  {a:"Claudio",id:"27909",n:"DIOGENES DE LIMA LUCAS",cpf:"38797812811",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP5 - RAO",r:"SPIO",e:"",p:"P1"},
+  {a:"Claudio",id:"31767",n:"PAULO ROGERIO MARQUES DE LIMA",cpf:"26562550823",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSP5 - RAO",r:"SPIO",e:"",p:"P0"},
+  {a:"Lucas",id:"38382",n:"ALINE JAMILE DA SILVA E SILVA VIANA",cpf:"14534443781",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"29097",n:"WAGNER XAVIER DOS SANTOS JUNIOR",cpf:"16229255723",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Mariana",id:"38036",n:"ALESSANDRO JOSE BARBOZA GUSMAO",cpf:"28575593803",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP2 - CPS",r:"SPIO",e:"",p:"P2"},
+  {a:"Larissa",id:"38455",n:"ARMANDO BOEMER ANTUNES DA COSTA",cpf:"55050271304",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSC2 - SC",r:"SUL",e:"",p:"P2"},
+  {a:"Lucas",id:"29097",n:"DANIEL ROSARIO VELOSO",cpf:"14172059708",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"38420",n:"YURI DE ALMEIDA CRUZ",cpf:"14969957754",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRRJ02 - São João de Meriti",r:"RIES",e:"ETC",p:"P2"},
+  {a:"Claudio",id:"32810",n:"CELSO APARECIDO DE GRANDE",cpf:"66598811000",v:"VAN",f:"Frota Spot",m:"Fulfillment",b:"Full SSP22 - São Carlos",r:"SPIO",e:"",p:"P0"},
+  {a:"Thiago",id:"FF_17090",n:"EDNILSON PAULA SILVA",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSP25 - Atibaia",r:"SP1",e:"",p:"Frota Fixa"},
+  {a:"Gabriel",id:"35386",n:"DOUGLAS HEFRAIN CELARIUS",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSC2 - Florianópolis",r:"SUL",e:"",p:"P1"},
+  {a:"Larissa",id:"34605",n:"GUILHERME BITTENCOURT MARTINS",cpf:"07363360952",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSC2 - SC",r:"SUL",e:"",p:"P2"},
+  {a:"Lucas",id:"32333",n:"EDUARDO MARTINS DOS SANTOS JUNIOR",cpf:"40238568865",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"37740",n:"VICTOR MOURA SILVA",cpf:"39810061862",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P1"},
+  {a:"Larissa",id:"28813",n:"HENRIQUE PEREIRA LOUZADA",cpf:"36285532885",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P2"},
+  {a:"Lucas",id:"36860",n:"CAUE CASARINO VIEIRA",cpf:"47592024802",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Claudio",id:"37566",n:"JUAREZ PARTELI ALVES DE MACEDO",cpf:"0296454761",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P0"},
+  {a:"Mariana",id:"27875",n:"CHARLES VILELA EUZEBIO",cpf:"07855653619",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P1"},
+  {a:"Lucas",id:"38198",n:"CLECIO LUAN SANTOS COSTA",cpf:"39505794860",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Larissa",id:"28363",n:"ROBERTO ALBERGONI",cpf:"19492527871",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"",p:"P2"},
+  {a:"Lucas",id:"36308",n:"EVERTON DAMIAO MORO",cpf:"30975676822",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P0"},
+  {a:"Lucas",id:"37519",n:"RENAN DOS SANTOS UZUM",cpf:"45014636861",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",e:"ETC",p:"P2"},
+  {a:"Gabriel",id:"42155",n:"RAFAEL SCHULTZ",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SMG5 - Poços de Caldas",r:"MG",e:"",p:"P1"},
+  {a:"Vinicius",id:"40032",n:"LEIDIOMAR LUIS RODRIGUES",cpf:"26583667878",v:"HR",f:"Frota Spot",m:"Last Mile",b:"SSP5 - ARE",r:"SP2",e:"",p:"P1"},
+  {a:"Lucas",id:"37519",n:"DANILO PARDINI DA SILVA",cpf:"44323560818",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP11 - PRU",r:"SPIO",e:"ETC",p:"P2"},
+  {a:"Mariana",id:"37962",n:"DANIEL BRITO DOS SANTOS",cpf:"40099174820",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"",p:"P2"},
+  {a:"Larissa",id:"29171",n:"DIEGO HONORATO DOS SANTOS",cpf:"35524121820",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",e:"",p:"P2"},
+  {a:"Vinicius",id:"39739",n:"DAVI DA SILVA VIEIRA",cpf:"16489100762",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP8 - SJC",r:"SP2",e:"",p:"P2"},
+  {a:"Claudio",id:"37946",n:"FERNANDO MATIAS",cpf:"28331101898",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"",p:"P2"},
+  {a:"Claudio",id:"36188",n:"DANIEL FERREIRA",cpf:"04525328924",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXPR4 - Maringá",r:"SUL",e:"",p:"P1"},
+  {a:"Larissa",id:"36481",n:"FELIPE NERI CORREIA",cpf:"09380149603",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P1"},
+  {a:"Claudio",id:"32363",n:"JOSE ADJAILSON DA SILVA",cpf:"25631921880",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"",p:"P2"},
+  {a:"Vinicius",id:"41274",n:"THAMIRIS DA SILVA DANTAS",cpf:"02535328500",v:"HR",f:"Frota Spot",m:"Last Mile",b:"SBA3 - Vitória da Conquista",r:"NONECO",e:"",p:"P2"},
+  {a:"Claudio",id:"36985",n:"MARCO ROBERTO LOURENCO DA SILVA",cpf:"30263657850",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",e:"",p:"P2"},
+  {a:"Joyce",id:"FF_16911",n:"JACSON ADRIEL DE RODRIGUES ESQUERDO",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SRS4 - Caxias do Sul",r:"SUL",e:"",p:"Frota Fixa"},
+  {a:"Gabriel",id:"40301",n:"GABRIEL JUNIO DE AQUINO SILVA",cpf:"13754144618",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SMG1 - Contagem",r:"MG",e:"",p:"P0"},
+  {a:"Joyce",id:"FF_16782",n:"JULIANA AMORIM DE OLIVEIRA MELLO",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSP20 - Sorocaba",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Lucas",id:"38172",n:"ELIAS FERREIRA DO PRADO",cpf:"28151843896",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"37736",n:"(sem nome)",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P1"},
+  {a:"Gabriel",id:"30490",n:"ALBERTO GOMES NETO",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP23 - Mogi das Cruzes",r:"SP2",e:"",p:"P0"},
+  {a:"Lucas",id:"38157",n:"MATHEUS DA SILVA FERREIRA",cpf:"50604878818",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"33253",n:"MARCOS ANTONIO DOS SANTOS",cpf:"06311618486",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPE1 - Recife",r:"NONECO",e:"ETC",p:"P2"},
+  {a:"Lucas",id:"36284",n:"ARLETON FERNANDO SANTOS DA SILVA",cpf:"13657709401",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPE1 - Recife",r:"NONECO",e:"ETC",p:"P2"},
+  {a:"Lara",id:"FF_16926",n:"WENDERSON SILVA DOS SANTOS",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SRS8 - Sapucaia do Sul",r:"SUL",e:"",p:"Frota Fixa"},
+  {a:"Thiago",id:"FF_17134",n:"RONALDO DE JESUS DUTRA",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SMN1 - São Luís",r:"NONECO",e:"",p:"Frota Fixa"},
+  {a:"Joyce",id:"FF_17051",n:"HANA KAROLINA PIRES DE OLIVEIRA",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SMR1 - Cuiabá",r:"NONECO",e:"",p:"Frota Fixa"},
+  {a:"Lucas",id:"33491",n:"RODRIGO CLEMENTIINO DE OLIVEIRA",cpf:"09017700432",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRN1 - Natal",r:"NONECO",e:"ETC",p:"P1"},
+  {a:"Lucas",id:"33980",n:"FERNANDO DA SILVA LASZLO",cpf:"22043124870",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP48 - Jaguaré",r:"SP2",e:"ETC",p:"P0"},
+  {a:"Lucas",id:"36985",n:"ANDERSON RUFINO BRAGA DE ANDRADE",cpf:"42383634859",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",e:"ETC",p:"P2"},
+  {a:"Larissa",id:"37412",n:"THIAGO DA SILVA BRAGA",cpf:"12000281478",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SPE1 - Recife",r:"NONECO",e:"",p:"P2"},
+  {a:"Lucas",id:"36858",n:"GUSTAVO HENRIQUE DOS SANTOS SIMAO",cpf:"50464014875",v:"HR",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2"},
+  {a:"Joyce",id:"FF_17048",n:"JOAO PEDRO BATISTA CARDOSO",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SDF1 - Brasília",r:"NONECO",e:"",p:"Frota Fixa"},
+  {a:"Vinicius",id:"41698",n:"LUCILAINE OLIVEIRA SILVA",cpf:"39773525805",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP9 - Limeira",r:"SP1",e:"",p:"P2"},
+  {a:"Joyce",id:"FF_17162",n:"MARLON HENRIQUE BRAVO DIAS",v:"VAN",f:"Frota Fixa",m:"",b:"",r:"",e:"",p:"Frota Fixa"},
+  {a:"Thiago",id:"FF_17090b",n:"FELIPE BASTOS FAGUNDES",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SSP25 - Atibaia",r:"SP1",e:"",p:"Frota Fixa"},
+  {a:"Vinicius",id:"41696",n:"MATHEUS BULSONI DE ANDRADE",cpf:"47629636822",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP9 - Limeira",r:"SP1",e:"",p:"P2"},
+  {a:"Vinicius",id:"38651",n:"GILBERTO JOSE SOARES",cpf:"27544494500",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SBA6 - Salvador",r:"NONECO",e:"",p:"P1"},
+  {a:"Vinicius",id:"39707",n:"FLAVIO PEREIRA DE ARAUJO",cpf:"31860234836",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SSP5 - ARE",r:"SP2",e:"",p:"P1"},
+];
+
+// ===== HELPERS =====
+const COLORS=['#2D3277','#16a34a','#ea580c','#dc2626','#7c3aed','#0891b2','#d97706','#db2777','#65a30d','#f59e0b'];
+const norm=s=>(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function countBy(arr,key){return arr.reduce((a,r)=>{const v=r[key]||'N/A';a[v]=(a[v]||0)+1;return a;},{});}
+const scOpts=(horiz=false)=>({plugins:{legend:{display:false}},scales:horiz?{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}}}});
+const scLeg=()=>({plugins:{legend:{labels:{color:'#374151',font:{family:'Inter',size:11}}}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}}}});
+const blPlugin={id:'bl',afterDatasetsDraw(chart){if(chart.config.type!=='bar')return;const{ctx}=chart;chart.data.datasets.forEach((ds,i)=>{chart.getDatasetMeta(i).data.forEach((bar,j)=>{const v=ds.data[j];if(!v)return;const{x,y}=bar.tooltipPosition();ctx.save();ctx.fillStyle='#1a1a2e';ctx.font='600 11px Inter,sans-serif';ctx.textAlign='center';const h=chart.config.options.indexAxis==='y';if(h){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(v,x+6,y);}else{ctx.textBaseline='bottom';ctx.fillText(v,x,y-6);}ctx.restore();});});}};
+Chart.register(blPlugin);
+function mkDonut(id,labels,data,colors,plugId){
+  return new Chart(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{labels:{color:'#374151',font:{family:'Inter',size:11}}}},cutout:'65%'},plugins:[{id:plugId,afterDatasetsDraw(chart){const{ctx,data}=chart;chart.getDatasetMeta(0).data.forEach((arc,i)=>{const v=data.datasets[0].data[i];if(!v)return;const{x,y}=arc.tooltipPosition();ctx.save();ctx.fillStyle='#fff';ctx.font='bold 12px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,x,y);ctx.restore();});}}]});
+}
+function renderBars(id,data,color='blue'){
+  const s=Object.entries(data).filter(([b])=>b&&b!=='N/A'&&b!=='').sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const mx=s[0]?s[0][1]:1;
+  const el=document.getElementById(id);
+  s.forEach(([n,c],i)=>{el.innerHTML+=`<div class="bar-row"><div class="bar-rank">${i+1}</div><div class="bar-name">${n}</div><div class="bar-wrap"><div class="bar-fill ${color}" style="width:${Math.round(c/mx*100)}%"></div></div><div class="bar-count">${c}</div></div>`;});
+}
+function renderAssist(id,data){
+  Object.entries(data).sort((a,b)=>b[1]-a[1]).forEach(([n,c])=>{
+    document.getElementById(id).innerHTML+=`<div class="assistant-card"><div class="assistant-avatar">${n[0]}</div><div><div class="assistant-name">${n}</div><div class="assistant-count">${c} ${c>1?'registros':'registro'}</div></div></div>`;
+  });
+}
+function gBadge(s){
+  if(s==='APROVADO')return`<span class="badge b-aprov">APROVADO</span>`;
+  if(s==='REPROVADO')return`<span class="badge b-reprov">REPROVADO</span>`;
+  if(s==='LICENCIAMENTO')return`<span class="badge b-licen">LICENCIAMENTO</span>`;
+  if(s==='FALTA DOC')return`<span class="badge b-falta">FALTA DOC</span>`;
+  if(s&&s.includes('PENDENTE'))return`<span class="badge b-pend">PENDENTE</span>`;
+  return`<span class="badge b-pend">PENDENTE</span>`;
+}
+function kpi(id,items){items.forEach(k=>{document.getElementById(id).innerHTML+=`<div class="kpi-card ${k.c||''}"><div class="kpi-label">${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`;});}
+function ins(id,items){items.forEach(i=>{document.getElementById(id).innerHTML+=`<div class="insight-card ${i.c||''}"><div class="insight-title">${i.t}</div><div class="insight-text">${i.x}</div></div>`;});}
+
+// ===== PESCA =====
+const pT=pesca.length;
+const pAp=pesca.filter(r=>r.g==='APROVADO').length,pRe=pesca.filter(r=>r.g==='REPROVADO').length,pPe=pesca.filter(r=>!r.g||r.g==='').length;
+const pBases=Object.keys(countBy(pesca,'b')).filter(b=>b&&b!=='N/A'&&b!=='').length;
+kpi('kpi-pesca',[{l:'Total Pescado',v:pT,s:'motoristas abordados',c:''},{l:'Aprovados Gerador',v:pAp,s:`${Math.round(pAp/pT*100)}%`,c:'green'},{l:'Sem Status',v:pPe,s:'não preenchido',c:'orange'},{l:'Assistentes',v:Object.keys(countBy(pesca,'a')).length,s:'ativos na pesca',c:''},{l:'Bases Cobertas',v:pBases,s:'bases distintas',c:''}]);
+const tBP=Object.entries(countBy(pesca,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1])[0];
+const tAP=Object.entries(countBy(pesca,'a')).sort((a,b)=>b[1]-a[1])[0];
+const tRP=Object.entries(countBy(pesca,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1])[0];
+ins('insights-pesca',[{c:'',t:'🏆 Base Mais Pescada',x:`<strong>${tBP[0]}</strong> liderou com <strong>${tBP[1]} abordagens</strong>.`},{c:'green',t:'✅ Aprovação no Gerador',x:`<strong>${pAp} de ${pT}</strong> com status aprovado (${Math.round(pAp/pT*100)}%).`},{c:'red',t:'🚫 Reprovados no Gerador',x:`<strong>${pRe} registro${pRe!==1?'s':''}</strong> com reprovação registrada.`},{c:'orange',t:'⏳ Sem Status Preenchido',x:`<strong>${pPe} registro${pPe!==1?'s':''}</strong> sem status — pode haver mais reprovados não registrados.`},{c:'',t:'🗺️ Regional Destaque',x:`Regional <strong>${tRP[0]}</strong> concentrou o maior volume.`},{c:'',t:'👤 Mais Ativo na Pesca',x:`<strong>${tAP[0]}</strong> com <strong>${tAP[1]} abordagens</strong>.`}]);
+new Chart(document.getElementById('cVP'),{type:'bar',data:{labels:Object.keys(countBy(pesca,'v')),datasets:[{data:Object.values(countBy(pesca,'v')),backgroundColor:COLORS,borderRadius:2}]},options:scOpts()});
+mkDonut('cMP',Object.keys(countBy(pesca,'m')).map(k=>k||'N/A'),Object.values(countBy(pesca,'m')),['#2D3277','#FFE600','#16a34a','#9ca3af'],'mpesca');
+const rPf=Object.fromEntries(Object.entries(countBy(pesca,'r')).filter(([k])=>k&&k!=='N/A'));
+new Chart(document.getElementById('cRP'),{type:'bar',data:{labels:Object.keys(rPf),datasets:[{data:Object.values(rPf),backgroundColor:COLORS,borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
+const gPC=countBy(pesca,'g');
+mkDonut('cGP',Object.keys(gPC).map(k=>k||'Pendente'),Object.values(gPC),['#16a34a','#dc2626','#9ca3af'],'gpesca');
+renderBars('bases-pesca',countBy(pesca,'b'),'green');
+renderAssist('assist-pesca',countBy(pesca,'a'));
+pesca.forEach(r=>{document.getElementById('tb-pesca').innerHTML+=`<tr><td>${r.a}</td><td>${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${r.m||'—'}</td><td>${gBadge(r.g)}</td></tr>`;});
+
+// ===== GUEP =====
+const gT=guep.length;
+const gAp=guep.filter(r=>r.s==='APROVADO').length,gRe=guep.filter(r=>r.s==='REPROVADO').length,gLi=guep.filter(r=>r.s==='LICENCIAMENTO').length,gFa=guep.filter(r=>r.s==='FALTA DOC').length,gPe=guep.filter(r=>r.s&&r.s.includes('PENDENTE')).length;
+kpi('kpi-guep',[{l:'Total Validado',v:gT,s:'registros na planilha GUEP',c:''},{l:'Aprovados',v:gAp,s:`${Math.round(gAp/gT*100)}%`,c:'green'},{l:'Reprovados',v:gRe,s:'não seguem',c:'red'},{l:'Licenciamento',v:gLi,s:'licenc. vencido',c:'orange'},{l:'Falta Doc',v:gFa,s:'doc. incompleta',c:'purple'},{l:'Pendentes',v:gPe,s:'aguardando retorno',c:''}]);
+const tAG=Object.entries(countBy(guep,'r')).sort((a,b)=>b[1]-a[1])[0];
+const gNA=gRe+gLi+gFa+gPe;
+ins('insights-guep',[{c:'green',t:'✅ Taxa de Aprovação',x:`<strong>${gAp} de ${gT}</strong> aprovados — <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'red',t:'🚫 Não Aprovados',x:`<strong>${gNA} motoristas</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc, ${gPe} pendentes.`},{c:'orange',t:'🚗 Licenciamento Vencido',x:`<strong>${gLi} motorista${gLi!==1?'s':''}</strong> — podem regularizar e retornar.`},{c:'purple',t:'📄 Falta de Documentação',x:`<strong>${gFa} motorista${gFa!==1?'s':''}</strong> — pipeline recuperável.`},{c:'',t:'👤 Responsável Mais Ativo',x:`<strong>${tAG[0]}</strong> com <strong>${tAG[1]} validações</strong>.`},{c:'',t:'📊 Visão Geral',x:`<strong>${gT} validações</strong> registradas na planilha oficial GUEP.`}]);
+const stC={'APROVADO':'#16a34a','REPROVADO':'#dc2626','LICENCIAMENTO':'#ea580c','FALTA DOC':'#7c3aed','PENDENTE ENVIO p/ GUEP':'#6b7280'};
+const gSt=countBy(guep,'s');
+new Chart(document.getElementById('cGS'),{type:'doughnut',data:{labels:Object.keys(gSt),datasets:[{data:Object.values(gSt),backgroundColor:Object.keys(gSt).map(k=>stC[k]||'#9ca3af'),borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{labels:{color:'#374151',font:{family:'Inter',size:11}}}},cutout:'60%'},plugins:[{id:'gs',afterDatasetsDraw(chart){const{ctx,data}=chart;chart.getDatasetMeta(0).data.forEach((arc,i)=>{const v=data.datasets[0].data[i];if(!v)return;const{x,y}=arc.tooltipPosition();ctx.save();ctx.fillStyle='#fff';ctx.font='bold 11px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,x,y);ctx.restore();});}}]});
+const gRsp=countBy(guep,'r');
+new Chart(document.getElementById('cGR'),{type:'bar',data:{labels:Object.keys(gRsp),datasets:[{data:Object.values(gRsp),backgroundColor:COLORS,borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
+renderAssist('assist-guep',gRsp);
+guep.forEach(r=>{document.getElementById('tb-guep').innerHTML+=`<tr><td>${r.r}</td><td>${r.n}</td><td style="color:var(--muted)">${r.c||'—'}</td><td style="color:var(--muted)">${r.p||'—'}</td><td>${r.f?`<span class="badge b-fixa">${r.f}</span>`:'—'}</td><td>${gBadge(r.s)}</td></tr>`;});
+
+// ===== CONTRATAÇÃO =====
+const cT=cont.length,cSp=cont.filter(r=>r.f==='Frota Spot').length,cFx=cont.filter(r=>r.f==='Frota Fixa').length,cEt=cont.filter(r=>r.e==='ETC').length,cFM=cont.filter(r=>r.m==='First Mile').length,cLM=cont.filter(r=>r.m==='Last Mile').length,cFF=cont.filter(r=>r.m==='Fulfillment').length;
+kpi('kpi-cont',[{l:'Total Contratado',v:cT,s:'registros',c:''},{l:'Frota Spot',v:cSp,s:`${Math.round(cSp/cT*100)}%`,c:''},{l:'Frota Fixa',v:cFx,s:`${Math.round(cFx/cT*100)}%`,c:'orange'},{l:'Com ETC',v:cEt,s:`${Math.round(cEt/cT*100)}%`,c:'green'},{l:'First Mile',v:cFM,s:`${Math.round(cFM/cT*100)}%`,c:''},{l:'Last Mile',v:cLM,s:`${Math.round(cLM/cT*100)}%`,c:''},{l:'Assistentes',v:Object.keys(countBy(cont,'a')).length,s:'ativos',c:''},{l:'Bases',v:Object.keys(countBy(cont,'b')).filter(b=>b&&b!=='').length,s:'distintas',c:''}]);
+const tBC=Object.entries(countBy(cont,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1])[0];
+const tVC=Object.entries(countBy(cont,'v')).sort((a,b)=>b[1]-a[1])[0];
+const tRC=Object.entries(countBy(cont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1])[0];
+const p0c=cont.filter(r=>r.p==='P0').length;
+ins('insights-cont',[{c:'',t:'🏆 Base Líder',x:`<strong>${tBC[0]}</strong> com <strong>${tBC[1]} contratações</strong>.`},{c:'',t:'🚚 Veículo Mais Contratado',x:`<strong>${tVC[0]}</strong> com <strong>${tVC[1]} unidades</strong>.`},{c:'green',t:'🔗 Penetração ETC',x:`<strong>${cEt} contratações (${Math.round(cEt/cT*100)}%)</strong> via ETC.`},{c:'red',t:'⚡ Demandas P0',x:`<strong>${p0c} urgentes (P0)</strong> realizadas hoje.`},{c:'',t:'🗺️ Regional Líder',x:`<strong>${tRC[0]}</strong> liderou.`},{c:'orange',t:'📦 Frota Fixa',x:`<strong>${cFx} (${Math.round(cFx/cT*100)}%)</strong> Frota Fixa.`}]);
+new Chart(document.getElementById('cVC'),{type:'bar',data:{labels:Object.keys(countBy(cont,'v')),datasets:[{data:Object.values(countBy(cont,'v')),backgroundColor:COLORS,borderRadius:2}]},options:scOpts()});
+mkDonut('cMC',Object.keys(countBy(cont,'m')).map(k=>k||'N/A'),Object.values(countBy(cont,'m')),['#2D3277','#FFE600','#16a34a','#9ca3af'],'mcont');
+mkDonut('cFC',['Spot','Fixa'],[cSp,cFx],['#2D3277','#FFE600'],'fcont');
+mkDonut('cEC',['Com ETC','Sem ETC'],[cEt,cT-cEt],['#16a34a','#d1d5db'],'econt');
+const prC=countBy(cont,'p');
+new Chart(document.getElementById('cPR'),{type:'bar',data:{labels:Object.keys(prC),datasets:[{data:Object.values(prC),backgroundColor:['#dc2626','#ea580c','#16a34a','#2D3277','#9ca3af'],borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
+renderBars('bases-cont',countBy(cont,'b'),'blue');
+renderAssist('assist-cont',countBy(cont,'a'));
+cont.forEach(r=>{
+  const fB=r.f==='Frota Fixa'?`<span class="badge b-fixa">FIXA</span>`:`<span class="badge b-spot">SPOT</span>`;
+  let pB=r.p;
+  if(r.p==='P0')pB=`<span class="badge b-p0">P0</span>`;
+  if(r.p==='P1')pB=`<span class="badge b-p1">P1</span>`;
+  if(r.p==='P2')pB=`<span class="badge b-p2">P2</span>`;
+  if(r.p==='Frota Fixa')pB=`<span class="badge b-fixa">FF</span>`;
+  const eB=r.e==='ETC'?`<span style="color:var(--green);font-size:10px;font-weight:600">✓ ETC</span>`:`—`;
+  document.getElementById('tb-cont').innerHTML+=`<tr><td>${r.a}</td><td style="color:var(--muted)">${r.id}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${fB}</td><td>${r.m||'—'}</td><td>${pB}</td><td>${eB}</td></tr>`;
+});
+
+// ===== CRUZAMENTO =====
+// Cruzamento por CPF: Pesca → GUEP → Contratação
+const normCPF=s=>(s||'').replace(/[^0-9]/g,'').trim();
+
+// CPFs contratados (da aba contratação, via CPF)
+const contCPFs=new Set(cont.map(r=>normCPF(r.cpf||'')).filter(c=>c.length>=9));
+
+// Para cada pescado, busca o CPF na planilha GUEP pelo nome
+const normN=s=>(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+const guepByNome=new Map(guep.map(r=>[normN(r.n),normCPF(r.c||'')]));
+
+// Pescados com CPF encontrado no GUEP
+const pescaComCPF=pesca.map(r=>{
+  const cpf=guepByNome.get(normN(r.n))||'';
+  return{...r,cpf};
+});
+
+// Pescados que foram contratados (CPF bate com contratação)
+const pCont=pescaComCPF.filter(r=>r.cpf&&contCPFs.has(r.cpf));
+// Pescados não contratados
+const pNaoCont=pescaComCPF.filter(r=>!r.cpf||!contCPFs.has(r.cpf));
+const conv=Math.round(pCont.length/pT*100);
+// Pipeline: não contratados, não reprovados no gerador, e aprovados no GUEP
+const pipelineList=pNaoCont.filter(r=>r.g!=='REPROVADO');
+const pipeline=pipelineList.length;
+
+[{num:pT,l:'Motoristas Abordados (Pesca)',s:'leads gerados no dia',pct:'100%'},{num:cT,l:'Contratados no dia',s:'concluíram cadastro no app',pct:`${Math.round(cT/pT*100)}%`}].forEach(f=>{document.getElementById('funnel').innerHTML+=`<div class="funnel-step"><div class="funnel-num">${f.num}</div><div><div class="funnel-label">${f.l}</div><div class="funnel-sub">${f.s}</div></div><div class="funnel-pct">${f.pct}</div></div>`;});
+
+[{v:`${conv}%`,l:'Conversão Pesca→Contratação',s:'dos pescados foram contratados',c:'var(--green)'},{v:`${Math.round(gAp/gT*100)}%`,l:'Taxa Aprovação GUEP',s:'dos validados aprovados',c:'var(--blue)'},{v:pipeline,l:'Pipeline Aberto',s:'aprovados ainda não contratados',c:'var(--orange)'}].forEach(m=>{document.getElementById('cross-metrics').innerHTML+=`<div class="cross-card"><div class="cross-value" style="color:${m.c}">${m.v}</div><div class="cross-label">${m.l}</div><div class="cross-sub">${m.s}</div></div>`;});
+
+const mRC=Object.entries(countBy(pCont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1])[0];
+ins('insights-cross',[{c:'green',t:'🎯 Taxa de Conversão',x:`De <strong>${pT} pescados</strong>, <strong>${pCont.length} foram contratados</strong> — conversão de <strong>${conv}%</strong>.`},{c:'',t:'🗺️ Melhor Regional em Conversão',x:`<strong>${mRC?mRC[0]:'—'}</strong> teve mais conversões pesca→contratação.`},{c:'orange',t:'⏳ Pipeline Aberto',x:`<strong>${pipeline} motoristas</strong> aprovados no GUEP ainda não contratados.`},{c:'red',t:'🚫 Não Aprovados GUEP',x:`<strong>${gRe+gLi+gFa}</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc.`},{c:'green',t:'📈 Eficiência',x:`Conversão <strong>${conv}%</strong> pesca→contratação. GUEP aprovou <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'purple',t:'🔄 Recuperáveis',x:`<strong>${gLi+gFa} motoristas</strong> (licenciamento + falta doc) podem regularizar.`}]);
+
+const allR=[...new Set([...pesca.map(r=>r.r),...cont.map(r=>r.r)].filter(r=>r&&r!=='N/A'&&r!==''))];
+new Chart(document.getElementById('cCR'),{type:'bar',data:{labels:allR,datasets:[{label:'Pescados',data:allR.map(r=>pesca.filter(x=>x.r===r).length),backgroundColor:'rgba(45,50,119,0.7)',borderRadius:2},{label:'Contratados',data:allR.map(r=>cont.filter(x=>x.r===r).length),backgroundColor:'rgba(22,163,74,0.7)',borderRadius:2}]},options:scLeg()});
+const aP=Object.keys(countBy(pesca,'a'));
+new Chart(document.getElementById('cCA'),{type:'bar',data:{labels:aP,datasets:[{label:'Pescados',data:aP.map(a=>pesca.filter(r=>r.a===a).length),backgroundColor:'rgba(45,50,119,0.7)',borderRadius:2},{label:'Convertidos',data:aP.map(a=>{
+  const cpfs=new Set(pescaComCPF.filter(r=>r.a===a&&r.cpf).map(r=>r.cpf));
+  return cpfs.size>0?cont.filter(r=>contCPFs.has(normCPF(r.cpf||''))&&cpfs.has(normCPF(r.cpf||''))).length:pescaComCPF.filter(r=>r.a===a&&contCPFs.has(r.cpf)).length;
+}),backgroundColor:'rgba(22,163,74,0.7)',borderRadius:2}]},options:scLeg()});
+pipelineList.forEach(r=>{document.getElementById('tb-pipeline').innerHTML+=`<tr><td>${r.a}</td><td>${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${gBadge(r.g)}</td><td><span class="badge b-naocont">Não contratado</span></td></tr>`;});
+
+// ===== RESUMO =====
+const tB5=Object.entries(countBy(cont,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1]).slice(0,5);
+const tB3P=Object.entries(countBy(pesca,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1]).slice(0,3);
+const tRgC=Object.entries(countBy(cont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1]);
+const resumo=`\u{1F4E6} *RELAT\u{00F3}RIO DI\u{00C1}RIO \u2014 26/05/2026*
+\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
+
+\u{1F3A3} *PESCA*
+\u2022 Total abordado: *${pT} motoristas*
+\u2022 Aprovados (gerador): *${pAp}* (${Math.round(pAp/pT*100)}%)
+\u2022 Reprovados (gerador): *${pRe}*
+\u2022 Sem status preenchido: *${pPe}*
+
+\u{1F50D} *GUEP (fonte oficial)*
+\u2022 Total validado: *${gT}*
+\u2022 Aprovados: *${gAp}* (${Math.round(gAp/gT*100)}%)
+\u2022 Reprovados: *${gRe}*
+\u2022 Licenciamento vencido: *${gLi}*
+\u2022 Falta documenta\u{00E7}\u{00E3}o: *${gFa}*
+\u2022 Pendentes: *${gPe}*
+
+\u2705 *CONTRATA\u{00C7}\u{00C3}O*
+\u2022 Total contratado: *${cT} motoristas*
+\u2022 Frota Spot: *${cSp}* (${Math.round(cSp/cT*100)}%)
+\u2022 Frota Fixa: *${cFx}* (${Math.round(cFx/cT*100)}%)
+\u2022 Com ETC: *${cEt}* (${Math.round(cEt/cT*100)}%)
+\u2022 First Mile: *${cFM}* | Last Mile: *${cLM}* | Fulfillment: *${cFF}*
+
+\u{1F500} *CRUZAMENTO*
+\u2022 Convers\u{00E3}o pesca\u2192contrata\u{00E7}\u{00E3}o: *${conv}%*
+\u2022 Pipeline aberto: *${pipeline}*
+\u2022 Recuper\u{00E1}veis (licenc. + falta doc): *${gLi+gFa}*
+
+\u{1F3C6} *TOP 5 BASES CONTRATADAS*
+${tB5.map(([b,c],i)=>`${i+1}. ${b}: *${c}*`).join('\n')}
+
+\u{1F3C5} *TOP 3 BASES PESCADAS*
+${tB3P.map(([b,c],i)=>`${i+1}. ${b}: *${c}*`).join('\n')}
+
+\u{1F5FA}\uFE0F *REGIONAIS CONTRATADAS*
+${tRgC.map(([r,c])=>`\u2022 ${r}: *${c}*`).join('\n')}
+
+\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
+\u{00C1}rea de Contrata\u{00E7}\u{00E3}o de Motoristas \u00B7 Mercado Livre`;
+document.getElementById('resumo-texto').textContent=resumo;
+function copyResumo(){navigator.clipboard.writeText(document.getElementById('resumo-texto').textContent).then(()=>{const b=document.querySelector('button[onclick="copyResumo()"]');b.textContent='COPIADO \u2713';b.style.background='#16a34a';b.style.color='#fff';setTimeout(()=>{b.textContent='COPIAR';b.style.background='var(--yellow)';b.style.color='#000';},2000);});}
+function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['pesca','guep','contratacao','cruzamento','resumo'][i]===n);});document.querySelectorAll('.tab-content').forEach(c=>{c.classList.toggle('active',c.id==='tab-'+n);});}
+</script>
+</body>
+</html>
