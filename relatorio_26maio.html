@@ -616,7 +616,7 @@ const rPf=Object.fromEntries(Object.entries(countBy(pesca,'r')).filter(([k])=>k&
 new Chart(document.getElementById('cRP'),{type:'bar',data:{labels:Object.keys(rPf),datasets:[{data:Object.values(rPf),backgroundColor:COLORS,borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
 const gPC=countBy(pesca,'g');
 mkDonut('cGP',Object.keys(gPC).map(k=>k||'Pendente'),Object.values(gPC),['#16a34a','#dc2626','#9ca3af'],'gpesca');
-renderBars('bases-pesca',countBy(pesca,'b'),'green');
+renderBars('bases-pesca',countBy(pesca,'b'),'blue');
 renderAssist('assist-pesca',countBy(pesca,'a'));
 pesca.forEach(r=>{document.getElementById('tb-pesca').innerHTML+=`<tr><td>${r.a}</td><td>${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${r.m||'—'}</td><td>${gBadge(r.g)}</td></tr>`;});
 
@@ -712,7 +712,7 @@ const mRC=Object.entries(countBy(pCont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='')
 ins('insights-cross',[{c:'green',t:'🎯 Taxa de Conversão',x:`De <strong>${pT} pescados</strong>, <strong>${pCont.length} foram contratados</strong> — conversão de <strong>${conv}%</strong>.`},{c:'',t:'🗺️ Melhor Regional em Conversão',x:`<strong>${mRC?mRC[0]:'—'}</strong> teve mais conversões pesca→contratação.`},{c:'orange',t:'⏳ Pipeline Aberto',x:`<strong>${pipeline} motoristas</strong> aprovados no GUEP ainda não contratados.`},{c:'red',t:'🚫 Não Aprovados GUEP',x:`<strong>${gRe+gLi+gFa}</strong>: ${gRe} reprovados, ${gLi} licenciamento, ${gFa} falta doc.`},{c:'green',t:'📈 Eficiência',x:`Conversão <strong>${conv}%</strong> pesca→contratação. GUEP aprovou <strong>${Math.round(gAp/gT*100)}%</strong>.`},{c:'purple',t:'🔄 Recuperáveis',x:`<strong>${gLi+gFa} motoristas</strong> (licenciamento + falta doc) podem regularizar.`}]);
 
 const allR=[...new Set([...pesca.map(r=>r.r),...cont.map(r=>r.r)].filter(r=>r&&r!=='N/A'&&r!==''))];
-new Chart(document.getElementById('cCR'),{type:'bar',data:{labels:allR,datasets:[{label:'Pescados',data:allR.map(r=>pesca.filter(x=>x.r===r).length),backgroundColor:'rgba(7,55,99,0.8)',borderRadius:2},{label:'Contratados',data:allR.map(r=>cont.filter(x=>x.r===r).length),backgroundColor:'rgba(255,230,0,0.9)',borderRadius:2}]},options:scLeg()});
+new Chart(document.getElementById('cCR'),{type:'bar',data:{labels:allR,datasets:[{label:'Pescados',data:allR.map(r=>pesca.filter(x=>x.r===r).length),backgroundColor:'rgba(7,55,99,0.8)',borderRadius:2},{label:'Contratados',data:allR.map(r=>cont.filter(x=>x.r===r).length),backgroundColor:'#FFE600',borderRadius:2}]},options:scLeg()});
 const aP=Object.keys(countBy(pesca,'a'));
 new Chart(document.getElementById('cCA'),{type:'bar',data:{labels:aP,datasets:[{label:'Pescados',data:aP.map(a=>pesca.filter(r=>r.a===a).length),backgroundColor:'rgba(45,50,119,0.7)',borderRadius:2},{label:'Convertidos',data:aP.map(a=>{
   const cpfs=new Set(pescaComCPF.filter(r=>r.a===a&&r.cpf).map(r=>r.cpf));
