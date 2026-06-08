@@ -83,6 +83,14 @@
   .b-p1{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
   .b-p2{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.3);}
   .b-naocont{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
+  .b-concluido{background:rgba(7,55,99,.08);color:var(--blue);border:1px solid rgba(7,55,99,.2);}
+  .b-erro{background:rgba(234,88,12,.1);color:var(--orange);border:1px solid rgba(234,88,12,.3);}
+  .b-reprovado{background:rgba(220,38,38,.1);color:var(--red);border:1px solid rgba(220,38,38,.3);}
+  .b-desistencia{background:rgba(107,114,128,.1);color:var(--muted);border:1px solid rgba(107,114,128,.3);}
+  .b-falta{background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.3);}
+  tr.row-erro td{background:rgba(234,88,12,.04);}
+  tr.row-reprov td{background:rgba(220,38,38,.04);}
+  tr.row-outros td{background:rgba(107,114,128,.04);}
   pre#resumo-texto{background:#f5f5f0;border:1px solid var(--border);padding:24px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;border-radius:6px;}
   footer{border-top:1px solid var(--border);padding:20px 40px;text-align:center;font-size:11px;color:var(--muted);background:var(--surface);}
 </style>
@@ -144,7 +152,7 @@
     <div class="section-label">Por Assistente</div><div class="assistants-grid" id="assist-cont"></div>
     <div class="section-label">Prioridade</div><div class="chart-card" style="margin-bottom:40px;max-width:500px"><div class="chart-wrap"><canvas id="cPR"></canvas></div></div>
     <div class="section-label">Detalhamento</div>
-    <div class="table-wrap"><table><thead><tr><th>Assistente</th><th>ID</th><th>Nome</th><th>Base</th><th>Regional</th><th>Veículo</th><th>Frota</th><th>Milha</th><th>Prioridade</th><th>ETC</th></tr></thead><tbody id="tb-cont"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>Assistente</th><th>ID</th><th>Nome</th><th>Base</th><th>Regional</th><th>Veículo</th><th>Frota</th><th>Milha</th><th>Status</th><th>Prioridade</th><th>ETC</th></tr></thead><tbody id="tb-cont"></tbody></table></div>
   </div>
   <div class="tab-content" id="tab-cruzamento">
     <div class="section-label">Funil Pesca → Contratação</div><div class="funnel" id="funnel"></div>
@@ -464,6 +472,11 @@ const cont=[
   {a:"Lucas",id:"43678",n:"ALAN CARLOS DE OLIVEIRA",cpf:"42208199839",v:"VAN",f:"Frota Spot",m:"First Mile",b:"BRXSP1 - ARE",r:"SP2",e:"ETC",p:"P1"},
   {a:"Thiago",id:"FF_16952",n:"IGOR BATISTA DE SA",cpf:"36049268827",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SSP30 - GRU",r:"SP1",e:"",p:"Frota Fixa"}
 ];
+const contExtra=[
+  {a:"Claudio",id:"41776",n:"MANOEL FERREIRA GUIMARAES",cpf:"68089651615",v:"TOCO",f:"Frota Spot",m:"First Mile",b:"BRXMG1 - MG",r:"MG",e:"",p:"P0",st:"Cadastro reprovado"},
+  {a:"Gabriel",id:"38993",n:"HUGO SOUSA PINTO",cpf:"11183661665",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SMG1 - Contagem",r:"MG",e:"",p:"P0",st:"Cadastro reprovado"}
+];
+
 
 // ===== HELPERS =====
 const COLORS=['#073763','#FFE600','#3d3d3d','#1a5fa8','#f5c200','#6b6b6b','#0a4d8a','#ccb800','#2a2a2a','#3378c5'];
@@ -549,8 +562,12 @@ renderAssist('assist-guep',gRsp);
 guep.forEach(r=>{document.getElementById('tb-guep').innerHTML+=`<tr><td>${r.r}</td><td>${r.n}</td><td style="color:var(--muted)">${r.c||'—'}</td><td style="color:var(--muted)">${r.p||'—'}</td><td>${r.f?`<span class="badge b-fixa">${r.f}</span>`:'—'}</td><td>${gBadge(r.s)}</td></tr>`;});
 
 // ===== CONTRATAÇÃO =====
+const contAll=[...cont,...contExtra];
 const cT=cont.length,cSp=cont.filter(r=>r.f==='Frota Spot').length,cFx=cont.filter(r=>r.f==='Frota Fixa').length,cEt=cont.filter(r=>r.e==='ETC').length,cFM=cont.filter(r=>r.m==='First Mile').length,cLM=cont.filter(r=>r.m==='Last Mile').length,cFF=cont.filter(r=>r.m==='Fulfillment').length;
-kpi('kpi-cont',[{l:'Total Contratado',v:cT,s:'registros',c:''},{l:'Frota Spot',v:cSp,s:`${Math.round(cSp/cT*100)}%`,c:''},{l:'Frota Fixa',v:cFx,s:`${Math.round(cFx/cT*100)}%`,c:'orange'},{l:'Com ETC',v:cEt,s:`${Math.round(cEt/cT*100)}%`,c:'green'},{l:'First Mile',v:cFM,s:`${Math.round(cFM/cT*100)}%`,c:''},{l:'Last Mile',v:cLM,s:`${Math.round(cLM/cT*100)}%`,c:''},{l:'Assistentes',v:Object.keys(countBy(cont,'a')).length,s:'ativos',c:''},{l:'Bases',v:Object.keys(countBy(cont,'b')).filter(b=>b&&b!=='').length,s:'distintas',c:''}]);
+const cErr=contExtra.filter(r=>r.st==='Cadastro com erro').length,cRep=contExtra.filter(r=>r.st==='Cadastro reprovado').length,cDes=contExtra.filter(r=>r.st==='Desistência').length,cFalta=contExtra.filter(r=>r.st==='Falta de interação').length,cSub=contExtra.filter(r=>r.st==='Substituição de motorista').length;
+const cTAll=contAll.length;
+kpi('kpi-cont',[{l:'Total Contratado',v:cT,s:'cadastros concluídos',c:''},{l:'Frota Spot',v:cSp,s:`${Math.round(cSp/cT*100)}%`,c:''},{l:'Frota Fixa',v:cFx,s:`${Math.round(cFx/cT*100)}%`,c:'orange'},{l:'Com ETC',v:cEt,s:`${Math.round(cEt/cT*100)}%`,c:'green'},{l:'First Mile',v:cFM,s:`${Math.round(cFM/cT*100)}%`,c:''},{l:'Last Mile',v:cLM,s:`${Math.round(cLM/cT*100)}%`,c:''},{l:'Assistentes',v:Object.keys(countBy(cont,'a')).length,s:'ativos',c:''},{l:'Bases',v:Object.keys(countBy(cont,'b')).filter(b=>b&&b!=='').length,s:'distintas',c:''},
+{l:'Cadastro com Erro',v:cErr,s:'pendência técnica',c:'orange'},{l:'Cad. Reprovado',v:cRep,s:'não aprovados',c:'red'},{l:'Desistência',v:cDes,s:'desistiram',c:''},{l:'Falta de Interação',v:cFalta,s:'sem resposta',c:''}]);
 const tBC=Object.entries(countBy(cont,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1])[0];
 const tVC=Object.entries(countBy(cont,'v')).sort((a,b)=>b[1]-a[1])[0];
 const tRC=Object.entries(countBy(cont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1])[0];
@@ -564,7 +581,7 @@ const prC=countBy(cont,'p');
 new Chart(document.getElementById('cPR'),{type:'bar',data:{labels:Object.keys(prC),datasets:[{data:Object.values(prC),backgroundColor:['#073763','#3d3d3d','#FFE600','#1a5fa8','#a0a0a0'],borderRadius:2}]},options:{...scOpts(true),indexAxis:'y',layout:{padding:{left:10}},scales:{x:{ticks:{color:'#6b7280',font:{family:'Inter',size:10}},grid:{color:'#e8e8e2'}},y:{ticks:{color:'#374151',font:{family:'Inter',size:11},padding:8},grid:{color:'#e8e8e2'}}}}});
 renderBars('bases-cont',countBy(cont,'b'),'blue');
 renderAssist('assist-cont',countBy(cont,'a'));
-cont.forEach(r=>{
+contAll.forEach(r=>{
   const fB=r.f==='Frota Fixa'?`<span class="badge b-fixa">FIXA</span>`:`<span class="badge b-spot">SPOT</span>`;
   let pB=r.p;
   if(r.p==='P0')pB=`<span class="badge b-p0">P0</span>`;
@@ -572,7 +589,16 @@ cont.forEach(r=>{
   if(r.p==='P2')pB=`<span class="badge b-p2">P2</span>`;
   if(r.p==='Frota Fixa')pB=`<span class="badge b-fixa">FF</span>`;
   const eB=r.e==='ETC'?`<span style="color:var(--green);font-size:10px;font-weight:600">✓ ETC</span>`:`—`;
-  document.getElementById('tb-cont').innerHTML+=`<tr><td>${r.a}</td><td style="color:var(--muted)">${r.id}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${fB}</td><td>${r.m||'—'}</td><td>${pB}</td><td>${eB}</td></tr>`;
+  const st=r.st||'Cadastro concluído no app';
+  let stB,rowCls='';
+  if(st==='Cadastro concluído no app'){stB=`<span class="badge b-concluido">✓ Concluído</span>`;}
+  else if(st==='Cadastro com erro'){stB=`<span class="badge b-erro">⚠ Com Erro</span>`;rowCls='row-erro';}
+  else if(st==='Cadastro reprovado'){stB=`<span class="badge b-reprovado">✗ Reprovado</span>`;rowCls='row-reprov';}
+  else if(st==='Desistência'){stB=`<span class="badge b-desistencia">Desistência</span>`;rowCls='row-outros';}
+  else if(st==='Falta de interação'){stB=`<span class="badge b-desistencia">Falta Interação</span>`;rowCls='row-outros';}
+  else if(st==='Substituição de motorista'){stB=`<span class="badge b-falta">Substituição</span>`;rowCls='row-outros';}
+  else{stB=`<span class="badge b-desistencia">${st}</span>`;rowCls='row-outros';}
+  document.getElementById('tb-cont').innerHTML+=`<tr class="${rowCls}"><td>${r.a}</td><td style="color:var(--muted)">${r.id}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.n}</td><td>${r.b||'—'}</td><td>${r.r||'—'}</td><td>${r.v}</td><td>${fB}</td><td>${r.m||'—'}</td><td>${stB}</td><td>${pB}</td><td>${eB}</td></tr>`;
 });
 
 // ===== CRUZAMENTO =====
