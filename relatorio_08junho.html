@@ -670,11 +670,11 @@ const resumo=`\u{1F4E6} *RELAT\u{00F3}RIO DI\u{00C1}RIO \u2014 08/06/2026*
 \u2022 Frota Fixa: *${cFx}* (${Math.round(cFx/cT*100)}%)
 \u2022 Com ETC: *${cEt}* (${Math.round(cEt/cT*100)}%)
 \u2022 First Mile: *${cFM}* | Last Mile: *${cLM}* | Fulfillment: *${cFF}*
-
-\u{1F500} *CRUZAMENTO*
-\u2022 Convers\u{00E3}o pesca\u2192contrata\u{00E7}\u{00E3}o: *${conv}%*
-\u2022 Pipeline aberto: *${pipeline}*
-\u2022 Recuper\u{00E1}veis (licenc. + falta doc): *${gLi+gFa}*
+${cErr>0?`\u2022 Cadastro com erro: *${cErr}*`:''}
+${cRep>0?`\u2022 Cadastro reprovado: *${cRep}*`:''}
+${cDes>0?`\u2022 Desist\u{00EA}ncia: *${cDes}*`:''}
+${cFalta>0?`\u2022 Falta de intera\u{00E7}\u{00E3}o: *${cFalta}*`:''}
+${cSub>0?`\u2022 Substitui\u{00E7}\u{00E3}o de motorista: *${cSub}*`:''}
 
 \u{1F3C6} *TOP 5 BASES CONTRATADAS*
 ${tB5.map(([b,c],i)=>`${i+1}. ${b}: *${c}*`).join('\n')}
