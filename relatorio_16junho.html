@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relatório Diário — 16/06/2026</title>
+<title>Relatório Diário — 08/06/2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -101,7 +101,7 @@
     <div class="logo-badge">MELI</div>
     <div>
       <div class="header-title">Relatório Diário — Pesca · GUEP · Contratação</div>
-      <div class="header-date">16 de Junho de 2026</div>
+      <div class="header-date">08 de Junho de 2026</div>
     </div>
   </div>
   <div class="header-date">ÁREA DE CONTRATAÇÃO</div>
@@ -176,7 +176,7 @@
     </div>
   </div>
 </main>
-<footer>Relatório gerado em 16/06/2026 · Mercado Livre — Área de Contratação de Motoristas</footer>
+<footer>Relatório gerado em 08/06/2026 · Mercado Livre — Área de Contratação de Motoristas</footer>
 <script>
 
 const pesca=[
@@ -466,13 +466,17 @@ const cont=[
   {a:"Lara",id:"FF_16609",n:"JONATHAN CASEMIRO SCHWED",cpf:"44076251806",v:"UTILITÁRIO",f:"Frota Fixa",m:"Last Mile",b:"SSP5 - ARE",r:"SPC",e:"",p:"Frota Fixa"},
   {a:"Lucas",id:"35427",n:"BRENO WILLIAN GRACIANO",cpf:"18301995793",v:"HR",f:"Frota Spot",m:"Last Mile",b:"SRJ3 - Volta Redonda",r:"RIES",e:"ETC",p:"P1"},
   {a:"Lucas",id:"40338",n:"CARLOS MAGNO DA CONCEICAO GOMES FREITAS",cpf:"13885230780",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRJ1 - Cordovil",r:"RIES",e:"ETC",p:"P0"},
-  {a:"Lucas",id:"40338",n:"DIOGO SEBASTIAO NEVES DE OLIVEIRA",cpf:"12744731790",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRJ1 - Cordovil",r:"RIES",e:"ETC",p:"P0"}
+  {a:"Lucas",id:"40338",n:"DIOGO SEBASTIAO NEVES DE OLIVEIRA",cpf:"12744731790",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRJ1 - Cordovil",r:"RIES",e:"ETC",p:"P0"},
+  {a:"Joyce",id:"FF_16803",n:"JHOLL KLEBER COSTA ARAUJO",cpf:"92966888253",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSC8 - Itajaí",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Joyce",id:"FF_16610",n:"KAIQUE SILVA MIRANDA",cpf:"44322384889",v:"VAN",f:"Frota Fixa",m:"Last Mile",b:"SSP5 - ARE",r:"SPC",e:"",p:"Frota Fixa"},
+  {a:"Joyce",id:"FF_16484",n:"DAVI ANDRADE DE OLIVEIRA PREVIATO",cpf:"51924968886",v:"VUC",f:"Frota Fixa",m:"Last Mile",b:"SSP17",r:"SPC",e:"",p:"Frota Fixa"}
 ];
 const contExtra=[
   {a:"Claudio",id:"43091",n:"JEAN RAIMUNDO PEREIRA",cpf:"04299105338",v:"VUC",f:"Frota Spot",m:"First Mile",b:"BRXSP4 - SBC",r:"SP1",e:"",p:"P2",st:"Cadastro reprovado"},
   {a:"Lucas",id:"39263",n:"ELIANO SILVIO DE SOUZA",cpf:"56955359053",v:"UTILITÁRIO",f:"Frota Spot",m:"Last Mile",b:"SRS8 - Sapucaia do Sul",r:"SUL",e:"ETC",p:"P1",st:"Substituição de motorista"},
   {a:"Lucas",id:"44177",n:"HENRIQUE BARCELOS DO PINHO",cpf:"34569605818",v:"MÉDIO",f:"Frota Spot",m:"First Mile",b:"BRXSP10 - GRU II",r:"SPC",e:"ETC",p:"P2",st:"Substituição de motorista"}
 ];
+
 
 
 // ===== HELPERS =====
@@ -562,6 +566,7 @@ guep.forEach(r=>{document.getElementById('tb-guep').innerHTML+=`<tr><td>${r.r}</
 const contAll=[...cont,...contExtra];
 const cT=cont.length,cSp=cont.filter(r=>r.f==='Frota Spot').length,cFx=cont.filter(r=>r.f==='Frota Fixa').length,cEt=cont.filter(r=>r.e==='ETC').length,cFM=cont.filter(r=>r.m==='First Mile').length,cLM=cont.filter(r=>r.m==='Last Mile').length,cFF=cont.filter(r=>r.m==='Fulfillment').length;
 const cErr=contExtra.filter(r=>r.st==='Cadastro com erro').length,cRep=contExtra.filter(r=>r.st==='Cadastro reprovado').length,cDes=contExtra.filter(r=>r.st==='Desistência').length,cFalta=contExtra.filter(r=>r.st==='Falta de interação').length,cSub=contExtra.filter(r=>r.st==='Substituição de motorista').length;
+const cTAll=contAll.length;
 kpi('kpi-cont',[{l:'Total Contratado',v:cT,s:'cadastros concluídos',c:''},{l:'Frota Spot',v:cSp,s:`${Math.round(cSp/cT*100)}%`,c:''},{l:'Frota Fixa',v:cFx,s:`${Math.round(cFx/cT*100)}%`,c:'orange'},{l:'Com ETC',v:cEt,s:`${Math.round(cEt/cT*100)}%`,c:'green'},{l:'First Mile',v:cFM,s:`${Math.round(cFM/cT*100)}%`,c:''},{l:'Last Mile',v:cLM,s:`${Math.round(cLM/cT*100)}%`,c:''},{l:'Assistentes',v:Object.keys(countBy(cont,'a')).length,s:'ativos',c:''},{l:'Bases',v:Object.keys(countBy(cont,'b')).filter(b=>b&&b!=='').length,s:'distintas',c:''},
 {l:'Cadastro com Erro',v:cErr,s:'pendência técnica',c:'orange'},{l:'Cad. Reprovado',v:cRep,s:'não aprovados',c:'red'},{l:'Desistência',v:cDes,s:'desistiram',c:''},{l:'Falta de Interação',v:cFalta,s:'sem resposta',c:''}]);
 const tBC=Object.entries(countBy(cont,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1])[0];
@@ -643,7 +648,7 @@ pipelineList.forEach(r=>{document.getElementById('tb-pipeline').innerHTML+=`<tr>
 const tB5=Object.entries(countBy(cont,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1]).slice(0,5);
 const tB3P=Object.entries(countBy(pesca,'b')).filter(([b])=>b&&b!=='').sort((a,b)=>b[1]-a[1]).slice(0,3);
 const tRgC=Object.entries(countBy(cont,'r')).filter(([r])=>r&&r!=='N/A'&&r!=='').sort((a,b)=>b[1]-a[1]);
-const resumo=`\u{1F4E6} *RELAT\u{00F3}RIO DI\u{00C1}RIO \u2014 16/06/2026*
+const resumo=`\u{1F4E6} *RELAT\u{00F3}RIO DI\u{00C1}RIO \u2014 08/06/2026*
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
 
 \u{1F3A3} *PESCA*
